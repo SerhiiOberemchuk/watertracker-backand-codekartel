@@ -27,12 +27,16 @@ const userSchema = new Schema(
     },
     name: {
       type: String,
-      default: "",
+      default: null,
     },
     gender: {
       type: String,
       enum: ["male", "female"],
     },
+    waterRate: {
+      type: Number,
+      default: ''
+    }
   },
   { versionKey: false, timestamps: true }
 );
