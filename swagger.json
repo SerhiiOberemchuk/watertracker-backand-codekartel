@@ -85,6 +85,18 @@
           }
         }
       }
+    },
+    "/user/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "description": "User logout",
+        "responses": {
+          "204": {
+            "description": "Logout successful, no content to return."
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
     }
   },
   "components": {
@@ -133,8 +145,17 @@
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "message": "",
-          "user": {}
+          "message": {
+            "type": "string",
+            "example": "Congratulations! Login successful!"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "example": "user`s name" },
+              "id": { "type": "string", "example": "125fggfb545bgd" }
+            }
+          }
         }
       }
     },
