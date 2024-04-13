@@ -7,6 +7,10 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    oldPassword: {
+      type: String,
+      default: null,
+    },
     email: {
       type: String,
       match: emailRegexp,
@@ -19,6 +23,15 @@ const userSchema = new Schema(
     },
     avatarURL: {
       type: String,
+      default: null,
+    },
+    name: {
+      type: String,
+      default: "",
+    },
+    sex: {
+      type: String,
+      enum: ["male", "female"],
       default: null,
     },
   },
