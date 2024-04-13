@@ -27,17 +27,20 @@ const userSchema = new Schema(
     },
     name: {
       type: String,
-      default: "",
-    },
-    sex: {
-      type: String,
-      enum: ["male", "female"],
       default: null,
     },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
+    waterRate: {
+      type: Number,
+      default: ''
+    }
   },
   { versionKey: false, timestamps: true }
 );
 
-const User = model("users", userSchema);
+const User = model("User", userSchema);
 
 export default User;

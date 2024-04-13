@@ -1,4 +1,5 @@
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -6,7 +7,8 @@ import "dotenv/config";
 
 import authRouter from "./routes/authRouter.js";
 import waterRouter from "./routes/waterRouter.js";
-import monthRouter from './routes/monthRouter.js';
+import monthRouter from "./routes/monthRouter.js";
+import { getSwaggerData } from "./services/getSwaggerData.js";
 
 const { PORT = 3000, DB_HOST } = process.env;
 
@@ -15,19 +17,18 @@ const app = express();
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
-
 app.use(express.static("public"));
 
 const startServer = async () => {
   try {
+    const swaggerDocument = await getSwaggerData();
     await mongoose.connect(DB_HOST);
     console.log("Database connection successful");
 
-
-      app.use("/users", authRouter);
-      app.use("/water", waterRouter);
-      app.use("/month", monthRouter);
-
+    app.use("/users", authRouter);
+    app.use("/water", waterRouter);
+    app.use("/month", monthRouter);
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use((_, res) => {
       res.status(404).json({ message: "Route not found" });
@@ -40,7 +41,7 @@ const startServer = async () => {
     });
 
     app.listen(PORT, () => {
-      console.log(`Server running on ${PORT}`);
+      console.log(`Server runing on ${PORT}`);
     });
   } catch (error) {
     console.error("Connection error", error);
@@ -48,6 +49,7 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
 startServer();
 
 export default app;
