@@ -23,12 +23,6 @@ const waterSchema = new Schema(
 );
 
 
-waterRecordSchema.post("save", handleSaveError);
-waterRecordSchema.pre('findOneAndUpdate', setUpdateSettings);
-waterRecordSchema.post("findOneAndUpdate", handleSaveError);
-
-const waterRecord = model("WaterRecord", waterRecordSchema);
-
 waterSchema.post("save", handleSaveError);
 waterSchema.pre("findOneAndUpdate", setUpdateSettings);
 waterSchema.post("findOneAndUpdate", handleSaveError);
