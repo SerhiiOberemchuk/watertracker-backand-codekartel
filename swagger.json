@@ -112,11 +112,6 @@
             "type": "string",
             "description": "User's email",
             "format": "email"
-          },
-          "userId": {
-            "type": "number",
-            "description": "User's id",
-            "example": "qwer1233asd456"
           }
         }
       },
@@ -135,7 +130,13 @@
           }
         }
       },
-      "LoginResponse": { "type": "object" }
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": "",
+          "user": {}
+        }
+      }
     },
     "securitySchemes": {
       "Bearer": {
