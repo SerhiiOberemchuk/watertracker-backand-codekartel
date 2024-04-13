@@ -19,8 +19,6 @@
       "post": {
         "tags": ["Auth"],
         "summary": "user registration",
-        "parameters": [],
-        "security": [{ "Bearer": [] }],
         "requestBody": {
           "description": "Registration's object",
           "required": true,
@@ -54,10 +52,10 @@
         }
       }
     },
-    "/user/login": {
+    "/users/login": {
       "post": {
         "tags": ["Auth"],
-        "description": "User login",
+        "summary": "User login",
         "requestBody": {
           "description": "Login credentials",
           "required": true,
@@ -81,20 +79,22 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {}
           }
         }
       }
     },
-    "/user/logout": {
+    "/users/logout": {
       "post": {
         "tags": ["Auth"],
-        "description": "User logout",
+        "summary": "User logout",
+        "security": [{ "Bearer": [] }],
         "responses": {
           "204": {
             "description": "Logout successful, no content to return."
           },
-          "401": { "description": "Unauthorized" }
+          "401": { "description": "Unauthorized", "content": {} }
         }
       }
     }
