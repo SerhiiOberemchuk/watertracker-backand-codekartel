@@ -2,32 +2,35 @@ import * as waterServices from "../services/waterServices.js";
 import HttpError from "../helpers/HttpError.js";
 import {ctrWrapper} from "../helpers/ctrWrapper.js";
 
-const getToday = async (req, res) => {
-const { _id } = req.params;
-const { _id: user } = req.user;
-const { value } = req.params;
-const { date } = req.params;
-const result = await waterServices.getWaterToday({ _id: id, user, value, date });
-if(!result) {
-throw HttpError(404, "Not found");
-}
-res.json(result);
+
+const addWaterRecord = async (req, res) => {
+    const { amount } = req.body;
+    const { _id: user } = req.user;
+    const record = await waterServices.createWaterRecord(user, amount);
+    res.status(201).json(record);
 };
 
-const updateTodayNow = async (req, res) => {
-    const { _id } = req.params;
-    const { _id: userId } = req.user;
-    const { value } = req.params;
-    const { date } = req.params;
-    const result = await waterServices.updateWaterToday({ _id:id, userId, value, date });
+
+const getWaterRecordsToday = async (req, res) => {
+    const { _id: user } = req.user;
+    const result = await waterServices.getWaterRecordsForToday(user);
     if (!result) {
         throw HttpError(404, "Not found");
     }
     res.json(result);
 };
 
+const getPercentOfDailyNorm = async (req, res) => {
+const { _id: user } = req.user;
+const { dailyNorm } = req.params;
+const records = await waterServices.getWaterRecordsForToday(user);
+const totalAmount = records.reduce((total,record)=> total + record.amount, 0);
+const percent = (totalAmount / dailyNorm) * 100;
+res.json({percent});
+};
 
 export default {
-    getToday: ctrWrapper(getToday),
-    updateTodayNow: ctrWrapper(updateTodayNow),
+    addWaterRecord: ctrWrapper(addWaterRecord),
+    getWaterRecordsToday: ctrWrapper(getWaterRecordsToday),
+    getPercentOfDailyNorm: ctrWrapper(getPercentOfDailyNorm),
 }

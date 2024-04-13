@@ -22,7 +22,12 @@ const waterSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-waterSchema.index({ date: 1, user: 1 }, { unique: true });
+
+waterRecordSchema.post("save", handleSaveError);
+waterRecordSchema.pre('findOneAndUpdate', setUpdateSettings);
+waterRecordSchema.post("findOneAndUpdate", handleSaveError);
+
+const waterRecord = model("WaterRecord", waterRecordSchema);
 
 waterSchema.post("save", handleSaveError);
 waterSchema.pre("findOneAndUpdate", setUpdateSettings);
@@ -31,3 +36,4 @@ waterSchema.post("findOneAndUpdate", handleSaveError);
 const Water = model("Water", waterSchema, "water");
 
 export default Water;
+

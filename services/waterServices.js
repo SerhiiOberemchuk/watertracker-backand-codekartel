@@ -1,8 +1,24 @@
-import Water from "../models/Water.js";
 
+
+import Water from "../models/Water.js";
+import waterRecord from "../models/waterRecordSchema.js";
 import dayjs from "dayjs";
 
-export const getWaterToday = (filter) => Water.findOne(filter);
+export const createWaterRecord = async(userId, amount) => {
+  const record = new waterRecord({ userId, amount });
+  await record.save();
+  return record;
+}
+
+
+export const getWaterRecordsForToday = async (user) => {
+  const startOfToday = new Date();
+    startOfToday.setHours(0, 0);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59);
+    const records = await waterRecord.find({ user, date: { $gte: startOfToday, $lte: endOfToday } });
+    return records;
+}
 
 export const updateWaterToday = (filter, data) =>
   Water.findOneAndUpdate(filter, data, { new: true });
@@ -13,6 +29,7 @@ export const addWater = async (data) => {
 };
 
 export const deleteWater = (filter) => Water.findOneAndDelete(filter);
+
 
 export const getWaterMonth = async (user, date) => {
   const firstDayOfMonth = dayjs(date).startOf("month").toISOString();

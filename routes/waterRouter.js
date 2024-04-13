@@ -11,7 +11,8 @@ const waterRouter = express.Router();
 
 waterRouter.use(authenticate);
 
-waterRouter.get("/today", todayController.getToday);
+
+waterRouter.get("/today", todayController.getPercentOfDailyNorm);
 waterRouter.post("/add", validateBody(addWaterSchema), waterControler.addWater);
 waterRouter.patch(
   "/:id/update",
@@ -21,5 +22,6 @@ waterRouter.patch(
 );
 waterRouter.patch("/calc", authenticate, waterControler.waterRateCtrl)
 waterRouter.delete("/:id/delete", isValidId, waterControler.deleteWater);
+
 
 export default waterRouter;
