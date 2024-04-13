@@ -7,7 +7,7 @@ const waterRouter = express.Router();
 
 waterRouter.use(authenticate);
 
-waterRouter.get("/today", todayController.getToday);
+waterRouter.get("/today", todayController.getPercentOfDailyNorm);
 
 
 export default waterRouter;
