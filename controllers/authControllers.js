@@ -39,6 +39,7 @@ const signUp = async (req, res, next) => {
 
   res.status(201).json({
     message: "Congratulations! You have successfully registered!",
+    email: newUser.email,
   });
 };
 
@@ -61,11 +62,16 @@ const signIn = async (req, res) => {
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
-  await User.findByIdAndUpdate(user._id, { token });
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    { token },
+    { new: true }
+  );
 
   res.status(200).json({
-    token,
     message: "Congratulations! Login successful!",
+
+    user: updatedUser,
   });
 };
 
