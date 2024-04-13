@@ -4,9 +4,18 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+import fs from "fs/promises";
+import gravatar from "gravatar";
 dotenv.config();
 
 const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const signUp = async (req, res, next) => {
   const { email, password } = req.body;
@@ -18,9 +27,11 @@ const signUp = async (req, res, next) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email);
 
   const newUser = await User.create({
     ...req.body,
+    avatarURL,
     password: hashedPassword,
   });
 
@@ -51,6 +62,7 @@ const signIn = async (req, res) => {
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
   await User.findByIdAndUpdate(user._id, { token });
+
   res.status(200).json({
     token,
     message: "Congratulations! Login successful!",
@@ -63,8 +75,55 @@ const logOut = async (req, res) => {
   res.status(204).json();
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+
+  if (!req.file) {
+    throw HttpError(400, "Please upload the file");
+  }
+  const { path: tempUpload, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
+
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join("/avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  if (!avatarURL) {
+    throw HttpError(401, "Not authorized");
+  }
+
+  res.json({ avatarURL });
+};
+
+const updateUserInfo = async (req, res) => {
+  const userId = req.params._id;
+  const updateData = { ...req.body };
+  if (updateData.password) {
+    updateData.password = await bcrypt.hash(updateData.password, 10);
+  }
+  const result = await User.findByIdAndUpdate(userId, updateData, {
+    new: true,
+  });
+
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+
+  res.json(result);
+};
+
+const getUserInfo = async (req, res) => {
+  const id = req.params._id;
+  const userData = await User.findOne({ _id: id }, "-createdAt -updatedAt");
+  res.json(userData);
+};
+
 export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
   logOut: ctrWrapper(logOut),
+  updateAvatar: ctrWrapper(updateAvatar),
+  updateUserInfo: ctrWrapper(updateUserInfo),
+  getUserInfo: ctrWrapper(getUserInfo),
 };

@@ -1,10 +1,15 @@
 import express from "express";
 import authController from "../controllers/authControllers.js";
 import validateBody from "../helpers/validateBody.js";
+import upload from "../middlewares/upload.js";
 
-import { userSignUpAndLoginSchema } from "../schemas/usersSchemas.js";
+import {
+  userSignUpAndLoginSchema,
+  updateUserInfoSchema,
+} from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
+import isValidId from "../middlewares/isValideId.js";
 
 const authRouter = express.Router();
 
@@ -21,5 +26,22 @@ authRouter.post(
 );
 
 authRouter.post("/logout", authenticate, authController.logOut);
+
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  authController.updateAvatar
+);
+
+authRouter.patch(
+  "/:_id/update/user/info",
+  authenticate,
+  isValidId,
+  validateBody(updateUserInfoSchema),
+  authController.updateUserInfo
+);
+
+authRouter.get("/:_id", authenticate, isValidId, authController.getUserInfo);
 
 export default authRouter;
