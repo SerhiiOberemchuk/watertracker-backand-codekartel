@@ -35,7 +35,7 @@ authRouter.patch(
 );
 
 authRouter.patch(
-  "/:_id/update/user/info",
+  "/:_id/",
   authenticate,
   isValidId,
   validateBody(updateUserInfoSchema),
