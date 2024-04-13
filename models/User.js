@@ -32,7 +32,6 @@ const userSchema = new Schema(
     sex: {
       type: String,
       enum: ["male", "female"],
-      default: null,
     },
   },
   { versionKey: false, timestamps: true }
