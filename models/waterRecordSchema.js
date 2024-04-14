@@ -12,7 +12,7 @@ const waterRecordSchema = new Schema({
         type: Date,
         required: true,
     },
-    amount: {
+    value: {
         type: Number,
         required: true,
     },
