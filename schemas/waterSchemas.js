@@ -28,3 +28,6 @@ export const updateWaterSchema = Joi.object({
   value: Joi.number().min(50).max(5000),
   time: Joi.time().required(),
 });
+export const waterRateSchema = Joi.object({
+  amountOfWater: Joi.number().min(0.1).max(15).required(),
+});
