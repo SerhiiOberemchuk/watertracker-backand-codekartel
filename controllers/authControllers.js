@@ -93,7 +93,7 @@ export const updateAvatar = async (req, res, next) => {
 };
 
 const updateUserInfo = async (req, res) => {
-  const userId = req.params._id;
+  const { _id: userId } = req.user;
   const updateData = { ...req.body };
   if (updateData.password) {
     updateData.password = await bcrypt.hash(updateData.password, 10);
@@ -110,8 +110,8 @@ const updateUserInfo = async (req, res) => {
 };
 
 const getUserInfo = async (req, res) => {
-  const id = req.params._id;
-  const userData = await User.findOne({ _id: id }).select("-password");
+  const { _id } = req.user;
+  const userData = await User.findOne({ _id }).select("-password");
   res.json({ user: userData });
 };
 

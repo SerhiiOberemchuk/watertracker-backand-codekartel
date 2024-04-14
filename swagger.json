@@ -171,7 +171,7 @@
     },
     "/users/avatars": {
       "patch": {
-        "tags": ["Auth"],
+        "tags": ["User"],
         "summary": "Update user`s avatar",
         "description": "Allows users to update their avatar image.",
         "security": [{ "Bearer": [] }],
@@ -209,6 +209,9 @@
           }
         }
       }
+    },
+    "users/:_id": {
+      "patch": {}
     }
   },
   "components": {
