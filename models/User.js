@@ -31,14 +31,15 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female"],
+      enum: ["male", "female", "other"],
+      default: "other",
     },
     waterRate: {
       type: Number,
-      default: ''
-    }
+      default: "",
+    },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 const User = model("User", userSchema);

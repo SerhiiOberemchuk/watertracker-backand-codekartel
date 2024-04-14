@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 import fs from "fs/promises";
-import gravatar from "gravatar";
+import { ok } from "assert";
 dotenv.config();
 
 const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
@@ -27,11 +27,9 @@ const signUp = async (req, res, next) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const avatarURL = gravatar.url(email);
 
   const newUser = await User.create({
     ...req.body,
-    avatarURL,
     password: hashedPassword,
   });
 
@@ -66,7 +64,7 @@ const signIn = async (req, res) => {
     user._id,
     { token },
     { new: true }
-  );
+  ).select("-password");
 
   res.status(200).json({
     message: "Congratulations! Login successful!",
@@ -102,7 +100,7 @@ const updateUserInfo = async (req, res) => {
   }
   const result = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
-  });
+  }).select("-password");
 
   if (!result) {
     throw HttpError(404, "Not found");
@@ -113,8 +111,8 @@ const updateUserInfo = async (req, res) => {
 
 const getUserInfo = async (req, res) => {
   const id = req.params._id;
-  const userData = await User.findOne({ _id: id }, "-createdAt -updatedAt");
-  res.json(userData);
+  const userData = await User.findOne({ _id: id }).select("-password");
+  res.json({ user: userData });
 };
 
 export default {
