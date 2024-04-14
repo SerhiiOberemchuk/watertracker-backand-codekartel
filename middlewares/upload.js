@@ -1,22 +1,37 @@
+import pkg from "cloudinary";
+const { v2: cloudinary } = pkg;
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
-import { fileURLToPath } from "url";
-import path, { dirname } from "path";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    let folder = "misc";
 
-const tempDir = path.join(__dirname, "../", "tmp");
+    if (file.fieldname === "avatar") {
+      folder = "avatars";
+    } else if (file.fieldname === "documents") {
+      folder = "documents";
+    }
 
-const multerConfig = multer.diskStorage({
-  destination: tempDir,
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    return {
+      folder,
+      allowed_formats: ["jpg", "png", "webp"],
+      public_id: file.originalname,
+      transformation: [
+        { width: 350, height: 350 },
+        { width: 700, height: 700 },
+      ],
+    };
   },
 });
 
-const upload = multer({
-  storage: multerConfig,
-});
+const upload = multer({ storage });
 
 export default upload;
