@@ -4,8 +4,8 @@ import Water from "../models/Water.js";
 import waterRecord from "../models/waterRecordSchema.js";
 import dayjs from "dayjs";
 
-export const createWaterRecord = async(userId, amount) => {
-  const record = new waterRecord({ userId, amount });
+export const createWaterRecord = async(userId, value) => {
+  const record = new waterRecord({ userId, value });
   await record.save();
   return record;
 }

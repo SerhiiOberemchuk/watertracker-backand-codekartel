@@ -6,7 +6,7 @@ import {ctrWrapper} from "../helpers/ctrWrapper.js";
 const addWaterRecord = async (req, res) => {
     const { amount } = req.body;
     const { _id: user } = req.user;
-    const record = await waterServices.createWaterRecord(user, amount);
+    const record = await waterServices.createWaterRecord(user, value);
     res.status(201).json(record);
 };
 
@@ -24,9 +24,9 @@ const getPercentOfDailyNorm = async (req, res) => {
 const { _id: user } = req.user;
 const { dailyNorm } = req.params;
 const records = await waterServices.getWaterRecordsForToday(user);
-const totalAmount = records.reduce((total,record)=> total + record.amount, 0);
-const percent = (totalAmount / dailyNorm) * 100;
-res.json({percent});
+const totalAmount = records.reduce((total,record)=> total + record.value, 0);
+const percentOfDailyNorm = (totalAmount / dailyNorm) * 100;
+res.json({percentOfDailyNorm, records});
 };
 
 export default {
