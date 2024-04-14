@@ -58,8 +58,8 @@ export const getWaterMonth = async (user, date) => {
     const recordsCount = oneDayData.length;
     values.push({
       date, // - Дата  в форматі - число, місяць (приклад - 5, April)
-      dailyNorm, // - Денна норма - кількість в літрах (приклад - 1.8 L)
-      percentOfDailyNorm, // - Процент спожитої води від денної норми - кількість в процентах (приклад - 60%)
+      dailyNorm: isFinite(dailyNorm) ? `${dailyNorm / 1000} L` : null, // - Денна норма - кількість в літрах (приклад - 1.8 L)
+      percentOfDailyNorm: percentOfDailyNorm && isFinite(percentOfDailyNorm) ? `${percentOfDailyNorm}%`: null, // - Процент спожитої води від денної норми - кількість в процентах (приклад - 60%)
       recordsCount, //- Скільки разів були записи про споживання води - кількість спожвань (приклад - 6)
     });
   }
