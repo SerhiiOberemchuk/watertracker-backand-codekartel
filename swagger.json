@@ -9,17 +9,37 @@
     { "url": "https://watertracker-backand-codekartel.onrender.com" }
   ],
   "tags": [
-    { "name": "Auth", "description": "Authorization endpoints" },
-    { "name": "User", "description": "User endpoints" },
-    { "name": "WaterRate", "description": "WaterRate endpoints" },
-    { "name": "Water", "description": "Water endpoints" },
-    { "name": "Today", "description": "Today endpoints" },
-    { "name": "Month", "description": "Month endpoints" }
+    {
+      "name": "Auth",
+      "description": "Authorization endpoints"
+    },
+    {
+      "name": "User",
+      "description": "User endpoints"
+    },
+    {
+      "name": "WaterRate",
+      "description": "WaterRate endpoints"
+    },
+    {
+      "name": "Water",
+      "description": "Water endpoints"
+    },
+    {
+      "name": "Today",
+      "description": "Today endpoints"
+    },
+    {
+      "name": "Month",
+      "description": "Month endpoints"
+    }
   ],
   "paths": {
     "/users/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "user registration",
         "requestBody": {
           "description": "Registration's object",
@@ -56,7 +76,9 @@
     },
     "/users/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "User login",
         "requestBody": {
           "description": "Login credentials",
@@ -89,14 +111,67 @@
     },
     "/users/logout": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "User logout",
-        "security": [{ "Bearer": [] }],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "responses": {
           "204": {
             "description": "Logout successful, no content to return."
           },
-          "401": { "description": "Unauthorized", "content": {} }
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/month/": {
+      "get": {
+        "tags": [
+          "Month"
+        ],
+        "summary": "The user received information for the month",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [{
+          "in": "query",
+          "name": "date",
+          "required": "true",
+          "type": "string",
+          "description": "users year and month"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {}
+          },
+          "404": {
+            "description": "Not found",
+            "content": {}
+          }
         }
       }
     },
@@ -114,7 +189,10 @@
     "schemas": {
       "RegistrationRequest": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
           "email": {
             "type": "string",
@@ -163,8 +241,42 @@
           "user": {
             "type": "object",
             "properties": {
-              "name": { "type": "string", "example": "user`s name" },
-              "id": { "type": "string", "example": "125fggfb545bgd" }
+              "name": {
+                "type": "string",
+                "example": "user`s name"
+              },
+              "id": {
+                "type": "string",
+                "example": "125fggfb545bgd"
+              }
+            }
+          }
+        }
+      },
+      "MonthResponse": {
+        "type": "array",
+        "items": {
+          "type":"object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "User's date",
+              "example": "5, April"
+            },
+            "dailyNorm": {
+              "type": "integer",
+              "description": "User's daily water requirement",
+              "example": "1.8 L"
+            },
+            "percentOfDailyNorm": {
+              "type": "integer",
+              "description": "The percentage of consumed water from the daily norm",
+              "example": "60%"
+            },
+            "recordsCount": {
+              "type": "integer",
+              "description": "The number of times there were records of water consumption",
+              "example": "6"
             }
           }
         }
