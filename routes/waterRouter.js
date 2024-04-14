@@ -24,6 +24,7 @@ waterRouter.patch(
 );
 waterRouter.patch(
   "/calc",
+  authenticate,
   validateBody(waterRateSchema),
   waterControler.waterRateCtrl
 );
