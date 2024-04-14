@@ -6,9 +6,7 @@
     "description": "Showing of WaterTracker points"
   },
   "servers": [
-    {
-      "url": "http://localhost:3000"
-    }
+    { "url": "https://watertracker-backand-codekartel.onrender.com" }
   ],
   "tags": [
     {
@@ -175,6 +173,15 @@
             "content": {}
           }
         }
+      }
+    },
+    "/users/avatars": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Udate user`s avatar",
+        "security": [{ "Bearer": [] }],
+        "params": [],
+        "requestBody": {}
       }
     }
   },
