@@ -5,7 +5,9 @@
     "title": "WaterTracker",
     "description": "Showing of WaterTracker points"
   },
-  "servers": [{ "url": "http://localhost:3000" }],
+  "servers": [
+    { "url": "https://watertracker-backand-codekartel.onrender.com" }
+  ],
   "tags": [
     { "name": "Auth", "description": "Authorization endpoints" },
     { "name": "User", "description": "User endpoints" },
@@ -96,6 +98,15 @@
           },
           "401": { "description": "Unauthorized", "content": {} }
         }
+      }
+    },
+    "/users/avatars": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Udate user`s avatar",
+        "security": [{ "Bearer": [] }],
+        "params": [],
+        "requestBody": {}
       }
     }
   },

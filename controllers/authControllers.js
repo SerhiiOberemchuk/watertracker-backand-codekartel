@@ -81,25 +81,17 @@ const logOut = async (req, res) => {
   res.status(204).json();
 };
 
-const updateAvatar = async (req, res) => {
-  const { _id } = req.user;
-
+export const updateAvatar = async (req, res, next) => {
   if (!req.file) {
-    throw HttpError(400, "Please upload the file");
+    throw HttpError(400, "Please upload an avatar image file.");
   }
-  const { path: tempUpload, originalname } = req.file;
-  const filename = `${_id}_${originalname}`;
-  const resultUpload = path.join(avatarsDir, filename);
-
-  await fs.rename(tempUpload, resultUpload);
-  const avatarURL = path.join("/avatars", filename);
-  await User.findByIdAndUpdate(_id, { avatarURL });
-
-  if (!avatarURL) {
-    throw HttpError(401, "Not authorized");
+  const avatarURL = req.file.path;
+  try {
+    await User.findByIdAndUpdate(req.user._id, { avatarURL });
+    res.json({ message: "Avatar updated successfully!", avatarURL });
+  } catch (error) {
+    throw HttpError(500, "Failed to update avatar.");
   }
-
-  res.json({ avatarURL });
 };
 
 const updateUserInfo = async (req, res) => {
