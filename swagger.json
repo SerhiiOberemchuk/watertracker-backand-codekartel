@@ -37,9 +37,7 @@
   "paths": {
     "/users/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "user registration",
         "requestBody": {
           "description": "Registration's object",
@@ -76,9 +74,7 @@
     },
     "/users/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User login",
         "requestBody": {
           "description": "Login credentials",
@@ -111,9 +107,7 @@
     },
     "/users/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "User logout",
         "security": [
           {
@@ -133,22 +127,22 @@
     },
     "/month/": {
       "get": {
-        "tags": [
-          "Month"
-        ],
+        "tags": ["Month"],
         "summary": "The user received information for the month",
         "security": [
           {
             "Bearer": []
           }
         ],
-        "parameters": [{
-          "in": "query",
-          "name": "date",
-          "required": "true",
-          "type": "string",
-          "description": "users year and month"
-        }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": "true",
+            "type": "string",
+            "description": "users year and month"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -178,10 +172,42 @@
     "/users/avatars": {
       "patch": {
         "tags": ["Auth"],
-        "summary": "Udate user`s avatar",
+        "summary": "Update user`s avatar",
+        "description": "Allows users to update their avatar image.",
         "security": [{ "Bearer": [] }],
         "params": [],
-        "requestBody": {}
+        "requestBody": {
+          "description": "Avatar image to upload",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AvatarsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the file is not provided or the request format is incorrect."
+          },
+          "401": {
+            "description": "Unauthorized if the user is not authenticated."
+          },
+          "500": {
+            "description": "Internal server error if there is an error during the process."
+          }
+        }
       }
     }
   },
@@ -189,10 +215,7 @@
     "schemas": {
       "RegistrationRequest": {
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "properties": {
           "email": {
             "type": "string",
@@ -218,6 +241,7 @@
       },
       "LoginRequest": {
         "type": "object",
+        "required": ["email", "password"],
         "properties": {
           "email": {
             "type": "string",
@@ -253,10 +277,33 @@
           }
         }
       },
+      "AvatarsRequest": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "format": "binary",
+            "description": "The image file to upload as the user's avatar."
+          }
+        }
+      },
+      "AvatarsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Avatar updated successfully!"
+          },
+          "avatarURL": {
+            "type": "string",
+            "example": "https://example.com/path/to/new/avatar.jpg"
+          }
+        }
+      },
       "MonthResponse": {
         "type": "array",
         "items": {
-          "type":"object",
+          "type": "object",
           "properties": {
             "date": {
               "type": "string",
