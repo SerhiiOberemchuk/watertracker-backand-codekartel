@@ -35,13 +35,12 @@ authRouter.patch(
 );
 
 authRouter.patch(
-  "/:_id/",
+  "/update",
   authenticate,
-  isValidId,
   validateBody(updateUserInfoSchema),
   authController.updateUserInfo
 );
 
-authRouter.get("/:_id", authenticate, isValidId, authController.getUserInfo);
+authRouter.get("/info", authenticate, authController.getUserInfo);
 
 export default authRouter;
