@@ -17,7 +17,7 @@ waterRouter.use(authenticate);
 waterRouter.get("/today", todayController.getPercentOfDailyNorm);
 waterRouter.post("/add", validateBody(addWaterSchema), waterControler.addWater);
 waterRouter.patch(
-  "/:id/update",
+  "/:_id",
   isValidId,
   validateBody(updateWaterSchema),
   waterControler.updateWater
@@ -27,6 +27,6 @@ waterRouter.patch(
   validateBody(waterRateSchema),
   waterControler.waterRateCtrl
 );
-waterRouter.delete("/:id/delete", isValidId, waterControler.deleteWater);
+waterRouter.delete("/:_id", isValidId, waterControler.deleteWater);
 
 export default waterRouter;
