@@ -3,7 +3,7 @@ import authenticate from "../middlewares/authenticate.js";
 import validateBody from "../helpers/validateBody.js";
 import todayController from "../controllers/todayController.js";
 import waterControler from "../controllers/waterControler.js";
-import { addWaterSchema, updateWaterSchema } from "../schemas/waterSchemas.js";
+import { addWaterSchema, updateWaterSchema, waterRateSchema } from "../schemas/waterSchemas.js";
 import isValidId from "../middlewares/isValidId.js";
 
 
@@ -20,7 +20,7 @@ waterRouter.patch(
   validateBody(updateWaterSchema),
   waterControler.updateWater
 );
-waterRouter.patch("/calc", authenticate, waterControler.waterRateCtrl)
+waterRouter.patch("/calc", authenticate, validateBody(waterRateSchema),waterControler.waterRateCtrl)
 waterRouter.delete("/:id/delete", isValidId, waterControler.deleteWater);
 
 
