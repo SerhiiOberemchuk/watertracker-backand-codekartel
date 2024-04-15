@@ -7,10 +7,6 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Password is required"],
     },
-    oldPassword: {
-      type: String,
-      default: null,
-    },
     email: {
       type: String,
       match: emailRegexp,
@@ -36,7 +32,7 @@ const userSchema = new Schema(
     },
     waterRate: {
       type: Number,
-      default: "",
+      default: 2,
     },
   },
   { versionKey: false }
