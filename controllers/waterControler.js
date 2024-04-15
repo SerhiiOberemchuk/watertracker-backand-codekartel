@@ -1,7 +1,7 @@
 import * as waterServices from "../services/waterServices.js";
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
-import User from "../models/User.js"
+import User from "../models/User.js";
 
 const addWater = async (req, res) => {
   const { _id: userId } = req.user;
@@ -53,27 +53,29 @@ const deleteWater = async (req, res) => {
 };
 
 const waterRateCtrl = async (req, res, next) => {
+  const { amountOfWater } = req.body;
+  const { _id } = req.user;
 
-    const { amountOfWater } = req.body;
-    const { id } = req.user;
-    
-    const updatedUser = await User.findByIdAndUpdate(
-        id,
-        { waterRate: amountOfWater},
-        { new: true }
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    { waterRate: amountOfWater },
+    { new: true }
+  );
+  if (amountOfWater > 15 || amountOfWater <= 0) {
+    throw HttpError(
+      400,
+      "The amount of water can't be more than 15l or less than 1ml"
     );
-    if(amountOfWater > 15 || amountOfWater <= 0){
-            throw HttpError(400, "The amount of water can't be more than 15l or less than 1ml")
-    }
-    if (!updatedUser) {
-        throw HttpError(404, "Not found");
-    }
-    res.json({ updatedUser });
+  }
+  if (!updatedUser) {
+    throw HttpError(404, "Not found");
+  }
+  res.json({ updatedUser });
 };
 
 export default {
   addWater: ctrWrapper(addWater),
   updateWater: ctrWrapper(updateWater),
   deleteWater: ctrWrapper(deleteWater),
-  waterRateCtrl: ctrWrapper(waterRateCtrl)
+  waterRateCtrl: ctrWrapper(waterRateCtrl),
 };
