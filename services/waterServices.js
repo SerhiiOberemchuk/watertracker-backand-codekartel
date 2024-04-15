@@ -1,24 +1,8 @@
 
-
 import Water from "../models/Water.js";
-import waterRecord from "../models/waterRecordSchema.js";
 import dayjs from "dayjs";
 
-export const createWaterRecord = async(userId, value) => {
-  const record = new waterRecord({ userId, value });
-  await record.save();
-  return record;
-}
 
-
-export const getWaterRecordsForToday = async (user) => {
-  const startOfToday = new Date();
-    startOfToday.setHours(0, 0);
-    const endOfToday = new Date();
-    endOfToday.setHours(23, 59);
-    const records = await waterRecord.find({ user, date: { $gte: startOfToday, $lte: endOfToday } });
-    return records;
-}
 
 export const updateWaterToday = (filter, data) =>
   Water.findOneAndUpdate(filter, data, { new: true });
@@ -30,6 +14,19 @@ export const addWater = async (data) => {
 
 export const deleteWater = (filter) => Water.findOneAndDelete(filter);
 
+export const getWaterRecordsToday = async (userId, date, dailyNorm) => {
+  const startOfDay = dayjs(date).startOf("day");
+  const endOfDay = dayjs(date).endOf("day");
+  const records = await Water.find({
+    user: userId,
+    date: { $gte: startOfDay, $lte: endOfDay },
+  })
+  const totalAmount = records.reduce((total, record) => total + record.value / 1000, 0);
+  const dailyNormFloat = parseFloat(dailyNorm);
+  const percentOfDailyNorm = Math.floor((totalAmount / dailyNormFloat) * 100);
+  
+  return { records, totalAmount, percentOfDailyNorm };
+}
 
 export const getWaterMonth = async (user, date) => {
   const firstDayOfMonth = dayjs(date).startOf("month").toISOString();

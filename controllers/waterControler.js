@@ -4,11 +4,11 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import User from "../models/User.js";
 
 const addWater = async (req, res) => {
-  const { _id: userId } = req.user;
+  const { _id: user } = req.user;
   const { value } = req.body;
   const { time } = req.body;
   const result = await waterServices.addWater({
-    userId,
+    user,
     value,
     time,
   });
@@ -21,15 +21,15 @@ const addWater = async (req, res) => {
 const updateWater = async (req, res) => {
   const { id } = req.params;
 
-  const { value, date } = req.body;
+  const { value, time } = req.body;
 
   const result = await waterServices.updateWaterToday(
     {
-      _id: id,
+      id,
     },
     {
       value,
-      date,
+      time,
     }
   );
   if (!result) {
@@ -42,18 +42,19 @@ const deleteWater = async (req, res) => {
   const { id } = req.params;
 
   const result = await waterServices.deleteWater({
-    _id: id,
+    id,
   });
   if (!result) {
     throw HttpError(404, "Not found");
   }
   res.json({
-    message: `The information on the  water intake with the id: ${id} deleted successfully. `,
+    message: `The information on the  water intake deleted successfully. `,
   });
 };
 
 const waterRateCtrl = async (req, res, next) => {
   const { amountOfWater } = req.body;
+
   const { _id } = req.user;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
