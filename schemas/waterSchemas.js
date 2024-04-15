@@ -4,7 +4,7 @@ const Joi = JoiBase.extend({
   type: "time",
   base: JoiBase.string(),
   messages: {
-    "time.base": '"{#label}" must be a valid time',
+    "time.base": "Please enter time in the format of HH:MM",
   },
   rules: {
     base: {
@@ -20,13 +20,19 @@ const Joi = JoiBase.extend({
 });
 
 export const addWaterSchema = Joi.object({
-  value: Joi.number().min(50).max(5000),
-  time: Joi.time().required(),
+  value: Joi.number().min(50).max(5000).messages({
+    "number.base": '"value" must be a number',
+    "number.min": '"value" must be at least {#limit}',
+    "number.max": '"value" must be less than or equal to {#limit}',
+  }),
+  time: Joi.time().base().required(),
 });
 
 export const updateWaterSchema = Joi.object({
-  value: Joi.number().min(50).max(5000),
-  time: Joi.time().required(),
+  value: Joi.number().messages({
+    "number.base": '"value" must be a number',
+  }),
+  time: Joi.time().base().required(),
 });
 export const waterRateSchema = Joi.object({
   amountOfWater: Joi.number().min(0.1).max(15).required(),
