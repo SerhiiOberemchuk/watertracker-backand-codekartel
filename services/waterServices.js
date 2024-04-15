@@ -21,8 +21,9 @@ export const getWaterRecordsToday = async (userId, date, dailyNorm) => {
     user: userId,
     date: { $gte: startOfDay, $lte: endOfDay },
   })
-  const totalAmount = records.reduce((total, record) => total + record.value, 0);
-  const percentOfDailyNorm = (totalAmount / dailyNorm) * 100;
+  const totalAmount = records.reduce((total, record) => total + record.value / 1000, 0);
+  const dailyNormFloat = parseFloat(dailyNorm);
+  const percentOfDailyNorm = Math.floor((totalAmount / dailyNormFloat) * 100);
   
   return { records, totalAmount, percentOfDailyNorm };
 }
