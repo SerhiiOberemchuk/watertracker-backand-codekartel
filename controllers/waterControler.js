@@ -4,13 +4,14 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import User from "../models/User.js";
 
 const addWater = async (req, res) => {
-  const { _id: user } = req.user;
+  const { _id: user, waterRate } = req.user;
+
   const { value } = req.body;
   const { time } = req.body;
   const result = await waterServices.addWater({
     user,
-    value,
-    time,
+    arrayValues: [{ value, time }],
+    waterRate,
   });
   if (!result) {
     throw HttpError(404, "Not found");

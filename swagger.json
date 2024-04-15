@@ -125,7 +125,7 @@
         }
       }
     },
-    "/month/": {
+    "/month": {
       "get": {
         "tags": ["Month"],
         "summary": "The user received information for the month",
@@ -210,8 +210,68 @@
         }
       }
     },
-    "users/:_id": {
-      "patch": {}
+    "users/update": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Update user`s data",
+        "description": "Allows users to update their information data",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "users/info": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user`s data",
+        "description": "Allows  to get user`s information data",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "water/today": {
+      "get": {
+        "tags": ["Today"],
+        "summary": "Summary",
+        "description": "Allows  to get .......",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "water/add": {
+      "post": {
+        "tags": ["Water"],
+        "summary": "Summary",
+        "description": "Allows  to .......",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "water/:id/update": {
+      "patch": {
+        "tags": ["Water"],
+        "summary": "Summary",
+        "description": "Allows  to .......",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "water/:id/delete": {
+      "delete": {
+        "tags": ["Water"],
+        "summary": "Summary",
+        "description": "Allows  to .......",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
+    },
+    "water/calc": {
+      "patch": {
+        "tags": ["WaterRate"],
+        "summary": "Summary",
+        "description": "Allows  to  .......",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {}
+      }
     }
   },
   "components": {

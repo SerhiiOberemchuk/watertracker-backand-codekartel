@@ -12,6 +12,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
+    const { _id } = req.user;
     let folder = "misc";
 
     if (file.fieldname === "avatar") {
@@ -23,7 +24,7 @@ const storage = new CloudinaryStorage({
     return {
       folder,
       allowed_formats: ["jpg", "png", "webp"],
-      public_id: file.originalname,
+      public_id: _id,
       transformation: [
         { width: 350, height: 350 },
         { width: 700, height: 700 },
