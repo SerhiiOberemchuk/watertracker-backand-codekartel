@@ -54,10 +54,12 @@ const deleteWater = async (req, res) => {
 
 const waterRateCtrl = async (req, res, next) => {
   const { amountOfWater } = req.body;
-  const { id } = req.user;
+
+  const { _id } = req.user;
 
   const updatedUser = await User.findByIdAndUpdate(
-    id,
+    _id,
+
     { waterRate: amountOfWater },
     { new: true }
   );
