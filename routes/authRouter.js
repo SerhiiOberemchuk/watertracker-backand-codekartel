@@ -9,7 +9,6 @@ import {
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
-import isValidId from "../middlewares/isValidId.js";
 
 const authRouter = express.Router();
 
