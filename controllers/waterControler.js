@@ -58,7 +58,6 @@ const waterRateCtrl = async (req, res, next) => {
   const { _id } = req.user;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
-
     { waterRate: amountOfWater },
     { new: true }
   );
