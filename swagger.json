@@ -246,24 +246,93 @@
         "requestBody": {}
       }
     },
-    "water/:id/update": {
+    "water/{id}": {
       "patch": {
         "tags": ["Water"],
-        "summary": "Summary",
-        "description": "Allows  to .......",
+        "summary": "Update water record",
+        "description": "Updates an existing water record identified by its ID.",
         "security": [{ "Bearer": [] }],
-        "requestBody": {}
-      }
-    },
-    "water/:id/delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the water record to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["value"],
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Amount of water in liters to update in the record."
+                  },
+                  "time": {
+                    "type": "string",
+                    "description": "Optional time of the water intake record."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated the water record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Water record not found."
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          }
+        }
+      },
       "delete": {
         "tags": ["Water"],
-        "summary": "Summary",
-        "description": "Allows  to .......",
+        "summary": "Delete water record",
+        "description": "Deletes a water record identified by its ID.",
         "security": [{ "Bearer": [] }],
-        "requestBody": {}
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the water record to delete."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deleted the water record."
+          },
+          "404": {
+            "description": "Water record not found."
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          }
+        }
       }
     },
+
     "water/calc": {
       "patch": {
         "tags": ["WaterRate"],
@@ -390,7 +459,8 @@
             }
           }
         }
-      }
+      },
+      "WaterResponse": {}
     },
     "securitySchemes": {
       "Bearer": {
