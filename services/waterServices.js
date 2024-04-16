@@ -14,19 +14,27 @@ export const addWater = async (data) => {
 
 export const deleteWater = (filter) => Water.findOneAndDelete(filter);
 
+
 export const getWaterRecordsToday = async (userId, date, dailyNorm) => {
   const startOfDay = dayjs(date).startOf("day");
   const endOfDay = dayjs(date).endOf("day");
-  const records = await Water.find({
-    user: userId,
+  const waterRecordsToday = await Water.find({
+    
     date: { $gte: startOfDay, $lte: endOfDay },
   })
-  const totalAmount = records.reduce((total, record) => total + record.value / 1000, 0);
+
+  const totalValue = waterRecordsToday.reduce((total, record) => {
+    const sumOfArrayValues = record.arrayValues.reduce((sum, value) => sum + value.value/1000, 0);
+    return total + sumOfArrayValues;
+  }, 0);
   const dailyNormFloat = parseFloat(dailyNorm);
-  const percentOfDailyNorm = Math.floor((totalAmount / dailyNormFloat) * 100);
+  const percentOfDailyNorm = Math.round((totalValue / dailyNormFloat) * 100);
   
-  return { records, totalAmount, percentOfDailyNorm };
+  return { waterRecordsToday, totalValue, percentOfDailyNorm };
 }
+
+
+
 
 export const getWaterMonth = async (user, date) => {
   const firstDayOfMonth = dayjs(date).startOf("month").toISOString();
