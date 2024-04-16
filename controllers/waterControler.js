@@ -20,23 +20,36 @@ const addWater = async (req, res) => {
 };
 
 const updateWater = async (req, res) => {
-  const { id } = req.params;
-
   const { value, time } = req.body;
+  const userId = req.user._id;
+  const { id: arrayValueId } = req.params;
 
-  const result = await waterServices.updateWaterToday(
-    {
-      id,
-    },
-    {
-      value,
-      time,
-    }
+  const waterRecordToUpdate = await waterServices.getWaterRecordById(userId);
+
+  if (!waterRecordToUpdate) {
+    throw HttpError(404, "Water record not found");
+  }
+
+  const arrayValueIndex = waterRecordToUpdate.arrayValues.findIndex(
+    (arrayValue) => arrayValue._id.toString() === arrayValueId
   );
-  if (!result) {
+
+  if (arrayValueIndex === -1) {
+    throw HttpError(404, "Array value not found");
+  }
+
+  waterRecordToUpdate.arrayValues[arrayValueIndex] = { value, time };
+
+  const updatedWaterRecord = await waterServices.updateWaterToday(
+    userId,
+    waterRecordToUpdate
+  );
+
+  if (!updatedWaterRecord) {
     throw HttpError(404, "Not found");
   }
-  res.json(result);
+
+  res.json(updatedWaterRecord);
 };
 
 const deleteWater = async (req, res) => {
