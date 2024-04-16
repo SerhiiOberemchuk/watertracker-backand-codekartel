@@ -213,19 +213,64 @@
     "users/update": {
       "patch": {
         "tags": ["User"],
-        "summary": "Update user`s data",
-        "description": "Allows users to update their information data",
+        "summary": "Update user data",
+        "description": "Allows authenticated users to update their profile information such as email, name, and password.",
         "security": [{ "Bearer": [] }],
-        "requestBody": {}
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User information updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters or missing required fields."
+          },
+          "401": {
+            "description": "Unauthorized. The user is not logged in or the token is invalid."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        }
       }
     },
     "users/info": {
       "get": {
         "tags": ["User"],
-        "summary": "Get user`s data",
-        "description": "Allows  to get user`s information data",
+        "summary": "Get user information",
+        "description": "Retrieves detailed information about the user based on their authentication token.",
         "security": [{ "Bearer": [] }],
-        "requestBody": {}
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. The user is not logged in or the token is invalid."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        }
       }
     },
     "water/today": {
@@ -336,10 +381,53 @@
     "water/calc": {
       "patch": {
         "tags": ["WaterRate"],
-        "summary": "Summary",
-        "description": "Allows  to  .......",
+        "summary": "Update user's daily water consumption rate",
+        "description": "Updates the user's daily water consumption rate. This rate should not exceed 15 liters or be less than 1 milliliter. The provided value is used to adjust the user's water consumption targets.",
         "security": [{ "Bearer": [] }],
-        "requestBody": {}
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amountOfWater"],
+                "properties": {
+                  "amountOfWater": {
+                    "type": "number",
+                    "description": "The amount of water in liters that the user plans to consume daily.",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Water consumption rate updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "updatedUser": {
+                      "$ref": "#/components/schemas/WaterRateResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid water rate provided; the rate must be between 1 milliliter and 15 liters."
+          },
+          "404": {
+            "description": "User not found or not available."
+          },
+          "401": {
+            "description": "Unauthorized. The user is not logged in or the token is invalid."
+          }
+        }
       }
     }
   },
@@ -409,6 +497,25 @@
           }
         }
       },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's new email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's full name"
+          },
+          "other": {
+            "type": "string",
+            "description": "other"
+          }
+        }
+      },
+      "UserUpdateResponse": {},
       "AvatarsRequest": {
         "type": "object",
         "properties": {
@@ -460,7 +567,25 @@
           }
         }
       },
-      "WaterResponse": {}
+      "WaterResponse": {},
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "Unique identifier for the user."
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email address."
+          },
+          "name": {
+            "type": "string",
+            "description": "User's full name."
+          }
+        }
+      },
+      "WaterRateResponse": {}
     },
     "securitySchemes": {
       "Bearer": {
