@@ -99,39 +99,37 @@ export const getWaterRecordsToday = async (userId, date,waterRate) => {
   return { arrayValuesOnly, percentOfDailyNorm };
 };
 
-export const getWaterMonth = async (user, date) => {
+export const getWaterMonth = async (userId, date) => {
   const firstDayOfMonth = dayjs(date).startOf("month").toISOString();
   const lastDayOfMonth = dayjs(date).endOf("month").toISOString();
   const daysInMonth = dayjs(date).daysInMonth();
   const currMonth = dayjs(date).format("MMMM");
 
   const oneMonthData = await Water.find({
-    user,
+    userId,
     date: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
   }).lean();
 
   const values = [];
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const oneDayData = oneMonthData.filter(
+    const oneDayData = oneMonthData.find(
       (item) => dayjs(item.date).date() === day
     );
+    console.log(oneDayData);
     const date = `${day}, ${currMonth}`;
-    const dailyNorm = Math.max(...oneDayData.map((item) => item.dailyNorm));
-    const sumOfValues = oneDayData.reduce(
-      (accumulator, item) => accumulator + item.value,
-      0
-    );
-    const percentOfDailyNorm = Math.round((sumOfValues / dailyNorm) * 100);
-    const recordsCount = oneDayData.length;
+    const waterRate = oneDayData?.waterRate;
+    const sumOfValues = oneDayData?.totalWater;
+    const percentOfWaterRate = Math.round(sumOfValues / (waterRate * 1000) * 100);
+    const recordsCount = oneDayData?.arrayValues?.length;
     values.push({
-      date, // - Дата  в форматі - число, місяць (приклад - 5, April)
-      dailyNorm: isFinite(dailyNorm) ? `${dailyNorm / 1000} L` : null, // - Денна норма - кількість в літрах (приклад - 1.8 L)
-      percentOfDailyNorm:
-        percentOfDailyNorm && isFinite(percentOfDailyNorm)
-          ? `${percentOfDailyNorm}%`
-          : null, // - Процент спожитої води від денної норми - кількість в процентах (приклад - 60%)
-      recordsCount, //- Скільки разів були записи про споживання води - кількість спожвань (приклад - 6)
+      date,
+      waterRate: isFinite(waterRate) ? `${waterRate} L` : null,
+      percentOfWaterRate:
+      percentOfWaterRate && isFinite(percentOfWaterRate)
+          ? `${percentOfWaterRate}%`
+          : null,
+      recordsCount:recordsCount ?? 0,
     });
   }
 

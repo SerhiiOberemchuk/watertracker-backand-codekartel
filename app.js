@@ -7,7 +7,6 @@ import "dotenv/config";
 
 import authRouter from "./routes/authRouter.js";
 import waterRouter from "./routes/waterRouter.js";
-import monthRouter from "./routes/monthRouter.js";
 import { getSwaggerData } from "./services/getSwaggerData.js";
 
 const { PORT = 3000, DB_HOST } = process.env;
@@ -27,7 +26,6 @@ const startServer = async () => {
 
     app.use("/users", authRouter);
     app.use("/water", waterRouter);
-    app.use("/month", monthRouter);
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use((_, res) => {
