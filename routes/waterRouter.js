@@ -9,12 +9,14 @@ import {
   waterRateSchema,
 } from "../schemas/waterSchemas.js";
 import isValidId from "../middlewares/isValidId.js";
+import monthController from '../controllers/monthController.js';
 
 const waterRouter = express.Router();
 
 waterRouter.use(authenticate);
 
 waterRouter.get("/today", todayController.getPercentOfDailyNorm);
+waterRouter.get("/month", monthController.getMonth);
 waterRouter.post("/add", validateBody(addWaterSchema), waterControler.addWater);
 waterRouter.patch(
   "/calc",
