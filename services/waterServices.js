@@ -21,6 +21,20 @@ export const checkWhetherWaterRecordExists = async (userId) => {
   return today;
 };
 
+export const findIndexById = (array, id) => {
+  const index = array.findIndex((element) => element._id.toString() === id);
+
+  if (index === -1) {
+    throw new Error("Array value not found");
+  }
+
+  return index;
+};
+
+export const recalculateTotalWater = (array) => {
+  return array.reduce((total, element) => total + element.value, 0);
+};
+
 export const addWater = async (data) => {
   const { user, waterRate, arrayValues } = data;
   let today = await checkWhetherWaterRecordExists(user);

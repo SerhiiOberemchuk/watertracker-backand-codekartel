@@ -31,20 +31,15 @@ const updateWater = async (req, res) => {
     throw HttpError(404, "Water record not found");
   }
 
-  const arrayValueIndex = waterRecordToUpdate.arrayValues.findIndex(
-    (arrayValue) => arrayValue._id.toString() === arrayValueId
+  const arrayValueIndex = waterServices.findIndexById(
+    waterRecordToUpdate.arrayValues,
+    arrayValueId
   );
-
-  if (arrayValueIndex === -1) {
-    throw HttpError(404, "Array value not found");
-  }
 
   waterRecordToUpdate.arrayValues[arrayValueIndex] = { value, time };
-  waterRecordToUpdate.totalWater = waterRecordToUpdate.arrayValues.reduce(
-    (total, arrayValue) => total + arrayValue.value,
-    0
+  waterRecordToUpdate.totalWater = waterServices.recalculateTotalWater(
+    waterRecordToUpdate.arrayValues
   );
-
   const updatedWaterRecord = await waterRecordToUpdate.save();
 
   if (!updatedWaterRecord) {
@@ -63,13 +58,10 @@ const deleteWater = async (req, res) => {
     throw HttpError(404, "Water record not found");
   }
 
-  const arrayValueIndex = waterRecordToDelete.arrayValues.findIndex(
-    (arrayValue) => arrayValue._id.toString() === arrayValueId
+  const arrayValueIndex = waterServices.findIndexById(
+    waterRecordToDelete.arrayValues,
+    arrayValueId
   );
-
-  if (arrayValueIndex === -1) {
-    throw HttpError(404, "Array value not found");
-  }
 
   // Remove the intake object from the arrayValues array
   const deletedArrayValue = waterRecordToDelete.arrayValues.splice(
@@ -77,9 +69,8 @@ const deleteWater = async (req, res) => {
     1
   );
 
-  waterRecordToDelete.totalWater = waterRecordToDelete.arrayValues.reduce(
-    (total, arrayValue) => total + arrayValue.value,
-    0
+  waterRecordToDelete.totalWater = waterServices.recalculateTotalWater(
+    waterRecordToDelete.arrayValues
   );
 
   // Save the waterRecord to the database
