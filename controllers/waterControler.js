@@ -2,6 +2,7 @@ import * as waterServices from "../services/waterServices.js";
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import User from "../models/User.js";
+import { ObjectId } from "mongodb";
 
 const addWater = async (req, res) => {
   const { _id: user, waterRate } = req.user;
@@ -22,7 +23,7 @@ const addWater = async (req, res) => {
 const updateWater = async (req, res) => {
   const { value, time } = req.body;
   const userId = req.user._id;
-  const { id: arrayValueId } = req.params;
+  const { _id: arrayValueId } = req.params;
 
   const waterRecordToUpdate = await waterServices.getWaterRecordById(userId);
 
@@ -39,11 +40,12 @@ const updateWater = async (req, res) => {
   }
 
   waterRecordToUpdate.arrayValues[arrayValueIndex] = { value, time };
-
-  const updatedWaterRecord = await waterServices.updateWaterToday(
-    userId,
-    waterRecordToUpdate
+  waterRecordToUpdate.totalWater = waterRecordToUpdate.arrayValues.reduce(
+    (total, arrayValue) => total + arrayValue.value,
+    0
   );
+
+  const updatedWaterRecord = await waterRecordToUpdate.save();
 
   if (!updatedWaterRecord) {
     throw HttpError(404, "Not found");
@@ -53,16 +55,40 @@ const updateWater = async (req, res) => {
 };
 
 const deleteWater = async (req, res) => {
-  const { id } = req.params;
+  const userId = req.user._id;
+  const { _id: arrayValueId } = req.params;
 
-  const result = await waterServices.deleteWater({
-    id,
-  });
-  if (!result) {
-    throw HttpError(404, "Not found");
+  const waterRecordToDelete = await waterServices.getWaterRecordById(userId);
+  if (!waterRecordToDelete) {
+    throw HttpError(404, "Water record not found");
   }
+
+  const arrayValueIndex = waterRecordToDelete.arrayValues.findIndex(
+    (arrayValue) => arrayValue._id.toString() === arrayValueId
+  );
+
+  if (arrayValueIndex === -1) {
+    throw HttpError(404, "Array value not found");
+  }
+
+  // Remove the intake object from the arrayValues array
+  const deletedArrayValue = waterRecordToDelete.arrayValues.splice(
+    arrayValueIndex,
+    1
+  );
+
+  waterRecordToDelete.totalWater = waterRecordToDelete.arrayValues.reduce(
+    (total, arrayValue) => total + arrayValue.value,
+    0
+  );
+
+  // Save the waterRecord to the database
+  const updatedWaterRecord = await waterRecordToDelete.save();
+
   res.json({
-    message: `The information on the  water intake deleted successfully. `,
+    message: `The information on the water intake below deleted successfully.`,
+    deletedRecord: deletedArrayValue[0],
+    updatedTotalWater: updatedWaterRecord.totalWater,
   });
 };
 

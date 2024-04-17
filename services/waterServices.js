@@ -2,54 +2,36 @@ import { get } from "mongoose";
 import Water from "../models/Water.js";
 import dayjs from "dayjs";
 
-export const getWaterRecordById = (filter) => Water.findById(filter);
-
-export const updateWaterRecordById = async (
-  userId,
-  waterRecordId,
-  newValue,
-  newTime
-) => {
-  const user = await getWaterRecordById({ userId });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  const index = user.arrayValues.findIndex(
-    (item) => item._id === waterRecordId
-  );
-
-  if (index === -1) {
-    throw new Error("Water record not found");
-  }
-
-  user.arrayValues[index].value = newValue;
-  user.arrayValues[index].time = newTime;
-
-  // Save the updated user object
-  await user.save();
-
-  return user;
+export const getWaterRecordById = async (userId) => {
+  return await Water.findOne({ userId: userId });
 };
 
-export const updateWaterToday = (filter, data) =>
-  Water.findOneAndUpdate(filter, data, { new: true });
+export const updateWaterToday = async (filter, data) =>
+  await Water.findOneAndUpdate(filter, data, { new: true });
+
+export const checkWhetherWaterRecordExists = async (userId) => {
+  let today = await Water.findOne({
+    userId,
+    date: {
+      $gte: dayjs().startOf("day").toDate(),
+      $lte: dayjs().endOf("day").toDate(),
+    },
+  });
+
+  return today;
+};
 
 export const addWater = async (data) => {
   const { user, waterRate, arrayValues } = data;
-  let today = await Water.findOne({
-    userId: user._id,
-    date: { $gte: dayjs().startOf("day"), $lte: dayjs().endOf("day") },
-  });
+  let today = await checkWhetherWaterRecordExists(user);
 
   if (!today) {
-    const totalWater = arrayValues.reduce((acc, item) => {
-      const value = item.value !== undefined ? Number(item.value) : 0;
-      return isNaN(value) ? acc : acc + value;
-    }, 0);
+    const totalWater = arrayValues.reduce(
+      (acc, item) => acc + Number(item.value || 0),
+      0
+    );
 
-    today = await Water.create({
+    today = new Water({
       userId: user._id,
       waterRate,
       arrayValues,
@@ -60,19 +42,20 @@ export const addWater = async (data) => {
     return today;
   }
 
-  const totalWater = arrayValues.reduce((acc, item) => {
-    const value = item.value !== undefined ? Number(item.value) : 0;
-    return isNaN(value) ? acc : acc + value;
-  }, today.totalWater);
+  const newTotalWater = arrayValues.reduce(
+    (acc, item) => acc + Number(item.value || 0),
+    today.totalWater
+  );
 
-  const updated = await Water.findByIdAndUpdate(today._id);
-  if (!updated) {
-    throw new Error("Water document not found");
-  }
+  const updated = await Water.findByIdAndUpdate(
+    today._id,
+    {
+      $push: { arrayValues: { $each: arrayValues } },
+      $set: { totalWater: newTotalWater },
+    },
+    { new: true }
+  );
 
-  updated.arrayValues.push(...arrayValues);
-  updated.totalWater = isNaN(totalWater) ? 0 : totalWater;
-  await updated.save();
   return updated;
 };
 
