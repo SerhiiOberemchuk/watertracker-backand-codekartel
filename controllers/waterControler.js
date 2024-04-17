@@ -101,6 +101,8 @@ const waterRateCtrl = async (req, res, next) => {
   if (!updatedUser) {
     throw HttpError(404, "Not found");
   }
+  await waterServices.writeWaterRateInRecord(amountOfWater, _id);
+
   res.json({ updatedUser });
 };
 

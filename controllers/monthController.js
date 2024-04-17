@@ -3,8 +3,7 @@ import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
 
 const getMonth = async (req, res) => {
-
-  const { date } = req.query; // 2024-04
+  const { date } = req.query;
   const { _id: userId } = req.user;
   const result = await waterServices.getWaterMonth(userId, date);
   if (!result) {
@@ -13,7 +12,6 @@ const getMonth = async (req, res) => {
   res.json(result);
 };
 
-
 export default {
   getMonth: ctrWrapper(getMonth),
-}
+};

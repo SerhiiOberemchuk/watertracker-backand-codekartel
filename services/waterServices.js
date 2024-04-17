@@ -1,4 +1,4 @@
-import { get } from "mongoose";
+import mongoose from "mongoose";
 import Water from "../models/Water.js";
 import dayjs from "dayjs";
 
@@ -6,8 +6,8 @@ export const getWaterRecordById = async (userId) => {
   return await Water.findOne({ userId: userId });
 };
 
-export const updateWaterToday = async (filter, data) =>
-  await Water.findOneAndUpdate(filter, data, { new: true });
+// export const updateWaterToday = async (filter, data) =>
+//   await Water.findOneAndUpdate(filter, data, { new: true });
 
 export const checkWhetherWaterRecordExists = async (userId) => {
   let today = await Water.findOne({
@@ -73,7 +73,19 @@ export const addWater = async (data) => {
   return updated;
 };
 
-export const deleteWater = (filter) => Water.findOneAndDelete(filter);
+// export const deleteWater = (filter) => Water.findOneAndDelete(filter);
+export const writeWaterRateInRecord = async (amountOfWater, _id) => {
+  const isRecord = await checkWhetherWaterRecordExists(_id);
+  console.log(isRecord._id);
+  if (isRecord) {
+    await Water.updateOne(
+      { _id: isRecord._id },
+      {
+        $set: { waterRate: amountOfWater },
+      }
+    );
+  }
+};
 
 export const getWaterRecordsToday = async (userId) => {
   const waterRecordsToday = await Water.findOne({
@@ -109,16 +121,18 @@ export const getWaterMonth = async (userId, date) => {
     const date = `${day}, ${currMonth}`;
     const waterRate = oneDayData?.waterRate;
     const sumOfValues = oneDayData?.totalWater;
-    const percentOfWaterRate = Math.round(sumOfValues / (waterRate * 1000) * 100);
+    const percentOfWaterRate = Math.round(
+      (sumOfValues / (waterRate * 1000)) * 100
+    );
     const recordsCount = oneDayData?.arrayValues?.length;
     values.push({
       date,
-      waterRate: isFinite(waterRate) ? `${waterRate} L` : null,
+      waterRate: isFinite(waterRate) ? waterRate : null,
       percentOfWaterRate:
-      percentOfWaterRate && isFinite(percentOfWaterRate)
-          ? `${percentOfWaterRate}%`
+        percentOfWaterRate && isFinite(percentOfWaterRate)
+          ? percentOfWaterRate
           : null,
-      recordsCount:recordsCount ?? 0,
+      recordsCount: recordsCount ?? 0,
     });
   }
 
