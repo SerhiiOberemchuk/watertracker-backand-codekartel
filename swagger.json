@@ -125,7 +125,7 @@
         }
       }
     },
-    "/month": {
+    "/water/month": {
       "get": {
         "tags": ["Month"],
         "summary": "The user received information for the month",
