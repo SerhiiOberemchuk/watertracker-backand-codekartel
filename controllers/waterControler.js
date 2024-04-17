@@ -3,6 +3,7 @@ import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import User from "../models/User.js";
 import { ObjectId } from "mongodb";
+import Water from "../models/Water.js";
 
 const addWater = async (req, res) => {
   const { _id: user, waterRate } = req.user;
@@ -20,12 +21,26 @@ const addWater = async (req, res) => {
   res.json(result);
 };
 
+export const writeWaterRateInRecord = async (amountOfWater, _id) => {
+  const isRecord = await checkWhetherWaterRecordExists(_id);
+  if (isRecord) {
+    await Water.updateOne(
+      { _id: isRecord._id },
+      {
+        $set: { waterRate: amountOfWater },
+      }
+    );
+  }
+};
+
 const updateWater = async (req, res) => {
   const { value, time } = req.body;
   const userId = req.user._id;
   const { _id: arrayValueId } = req.params;
 
   const waterRecordToUpdate = await waterServices.getWaterRecordById(userId);
+
+  const arrayValuesBeforeUpdate = [...waterRecordToUpdate.arrayValues];
 
   if (!waterRecordToUpdate) {
     throw HttpError(404, "Water record not found");
@@ -40,13 +55,30 @@ const updateWater = async (req, res) => {
   waterRecordToUpdate.totalWater = waterServices.recalculateTotalWater(
     waterRecordToUpdate.arrayValues
   );
+
   const updatedWaterRecord = await waterRecordToUpdate.save();
 
   if (!updatedWaterRecord) {
     throw HttpError(404, "Not found");
   }
 
-  res.json(updatedWaterRecord);
+  const updatedObject = waterRecordToUpdate.arrayValues.find(
+    (arrayValueAfterUpdate) => {
+      return !arrayValuesBeforeUpdate.some(
+        (arrayValueBeforeUpdate) =>
+          arrayValueBeforeUpdate._id.toString() ===
+          arrayValueAfterUpdate._id.toString()
+      );
+    }
+  );
+
+  console.log("Updated Object:", updatedObject);
+
+  res.json({
+    message: `The object with the id: ${arrayValueId} updated successfully and has got the new _id: ${updatedObject._id}.`,
+    updatedObject,
+    updatedTotalWater: updatedWaterRecord.totalWater,
+  });
 };
 
 const deleteWater = async (req, res) => {
