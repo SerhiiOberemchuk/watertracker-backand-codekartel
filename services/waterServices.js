@@ -84,7 +84,7 @@ export const getWaterRecordsToday = async (userId, date,waterRate) => {
   const waterRecordsToday = await Water.find({
     date: { $gte: startOfDay, $lte: endOfDay },
   });
-  const arrayValuesOnly = waterRecordsToday.map(record => record.arrayValues);
+  const arrayValuesOnly = waterRecordsToday.flatMap(record => record.arrayValues);
 
   const totalWater = waterRecordsToday.reduce((total, record) => {
     const sumOfArrayValues = record.arrayValues.reduce(
