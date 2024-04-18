@@ -501,12 +501,11 @@
         }
       }
     },
-
     "water/calc": {
       "patch": {
         "tags": ["WaterRate"],
         "summary": "Update user's daily water consumption rate",
-        "description": "Updates the user's daily water consumption rate. This rate should not exceed 15 liters or be less than 1 milliliter. The provided value is used to adjust the user's water consumption targets.",
+        "description": "Updates the user's daily water consumption rate. This rate should not exceed 15 liters or be less than 1. The provided value is used to adjust the user's water consumption targets.",
         "security": [{ "Bearer": [] }],
         "requestBody": {
           "required": true,
@@ -543,7 +542,7 @@
             }
           },
           "400": {
-            "description": "Invalid water rate provided; the rate must be between 1 milliliter and 15 liters."
+            "description": "Invalid water rate provided; the rate must be between 1 and 15 liters."
           },
           "404": {
             "description": "User not found or not available."
@@ -713,10 +712,6 @@
       "WaterRecord": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string"
-          },
-
           "value": {
             "type": "number",
             "description": "Amount of water consumed in this record in liters."
