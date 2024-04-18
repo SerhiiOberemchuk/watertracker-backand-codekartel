@@ -36,50 +36,67 @@ export const writeWaterRateInRecord = async (amountOfWater, _id) => {
 const updateWater = async (req, res) => {
   const { value, time } = req.body;
   const userId = req.user._id;
-  const { _id: arrayValueId } = req.params;
+  const { _id: objectId } = req.params;
 
-  const waterRecordToUpdate = await waterServices.getWaterRecordById(userId);
-
-  const arrayValuesBeforeUpdate = [...waterRecordToUpdate.arrayValues];
-
-  if (!waterRecordToUpdate) {
-    throw HttpError(404, "Water record not found");
-  }
-
-  const arrayValueIndex = waterServices.findIndexById(
-    waterRecordToUpdate.arrayValues,
-    arrayValueId
-  );
-
-  waterRecordToUpdate.arrayValues[arrayValueIndex] = { value, time };
-  waterRecordToUpdate.totalWater = waterServices.recalculateTotalWater(
-    waterRecordToUpdate.arrayValues
+  const waterRecordToUpdate = await waterServices.updateValueWater(
+    userId,
+    objectId,
+    value,
+    time
   );
 
   const updatedWaterRecord = await waterRecordToUpdate.save();
 
-  if (!updatedWaterRecord) {
-    throw HttpError(404, "Not found");
-  }
-
-  const updatedObject = waterRecordToUpdate.arrayValues.find(
-    (arrayValueAfterUpdate) => {
-      return !arrayValuesBeforeUpdate.some(
-        (arrayValueBeforeUpdate) =>
-          arrayValueBeforeUpdate._id.toString() ===
-          arrayValueAfterUpdate._id.toString()
-      );
-    }
-  );
-
-  console.log("Updated Object:", updatedObject);
-
-  res.json({
-    message: `The object with the id: ${arrayValueId} updated successfully and has got the new _id: ${updatedObject._id}.`,
-    updatedObject,
-    updatedTotalWater: updatedWaterRecord.totalWater,
-  });
+  res.json(waterRecordToUpdate);
 };
+
+// const updateWater = async (req, res) => {
+//   const { value, time } = req.body;
+//   const userId = req.user._id;
+//   const { _id: arrayValueId } = req.params;
+
+//   const waterRecordToUpdate = await waterServices.getWaterRecordById(userId);
+
+//   const arrayValuesBeforeUpdate = [...waterRecordToUpdate.arrayValues];
+
+//   if (!waterRecordToUpdate) {
+//     throw HttpError(404, "Water record not found");
+//   }
+
+//   const arrayValueIndex = waterServices.findIndexById(
+//     waterRecordToUpdate.arrayValues,
+//     arrayValueId
+//   );
+
+//   waterRecordToUpdate.arrayValues[arrayValueIndex] = { value, time };
+//   waterRecordToUpdate.totalWater = waterServices.recalculateTotalWater(
+//     waterRecordToUpdate.arrayValues
+//   );
+
+//   const updatedWaterRecord = await waterRecordToUpdate.save();
+
+//   if (!updatedWaterRecord) {
+//     throw HttpError(404, "Not found");
+//   }
+
+//   const updatedObject = waterRecordToUpdate.arrayValues.find(
+//     (arrayValueAfterUpdate) => {
+//       return !arrayValuesBeforeUpdate.some(
+//         (arrayValueBeforeUpdate) =>
+//           arrayValueBeforeUpdate._id.toString() ===
+//           arrayValueAfterUpdate._id.toString()
+//       );
+//     }
+//   );
+
+//   console.log("Updated Object:", updatedObject);
+
+//   res.json({
+//     message: `The object with the id: ${arrayValueId} updated successfully and has got the new _id: ${updatedObject._id}.`,
+//     updatedObject,
+//     updatedTotalWater: updatedWaterRecord.totalWater,
+//   });
+// };
 
 const deleteWater = async (req, res) => {
   const userId = req.user._id;
