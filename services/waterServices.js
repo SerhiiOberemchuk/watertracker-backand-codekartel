@@ -21,6 +21,19 @@ export const checkWhetherWaterRecordExists = async (userId) => {
   return today;
 };
 
+export const updateValueWater = async (userId, objectId, value, time) => {
+  const updateRecord = await Water.findOneAndUpdate(
+    { userId, "arrayValues._id": objectId },
+    { $set: { "arrayValues.$.value": value, "arrayValues.$.time": time } },
+    { new: true }
+  );
+  const updatedObject = updateRecord.arrayValues.find(
+    (obj) => obj._id.toString() === objectId
+  );
+
+  return updatedObject;
+};
+
 export const findIndexById = (array, id) => {
   const index = array.findIndex((element) => element._id.toString() === id);
 
