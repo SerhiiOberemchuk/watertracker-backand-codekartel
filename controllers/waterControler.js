@@ -155,7 +155,7 @@ const waterRateCtrl = async (req, res, next) => {
   }
   await waterServices.writeWaterRateInRecord(amountOfWater, _id);
 
-  res.json({ updatedUser });
+  res.json({ updatedUser: { waterRate: updatedUser.waterRate } });
 };
 
 export default {

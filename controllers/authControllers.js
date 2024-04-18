@@ -68,7 +68,15 @@ const signIn = async (req, res) => {
   res.status(200).json({
     message: "Congratulations! Login successful!",
 
-    user: updatedUser,
+    user: {
+      _id: updatedUser._id,
+      email: updatedUser.email,
+      token: updatedUser.token,
+      avatarURL: updatedUser.avatarURL,
+      name: updatedUser.name,
+      gender: updatedUser.gender,
+      waterRate: updatedUser.waterRate,
+    },
   });
 };
 
@@ -105,13 +113,31 @@ const updateUserInfo = async (req, res) => {
     throw HttpError(404, "Not found");
   }
 
-  res.json(result);
+  res.json({
+    _id: result._id,
+    email: result.email,
+    token: result.token,
+    avatarURL: result.avatarURL,
+    name: result.name,
+    gender: result.gender,
+    waterRate: result.waterRate,
+  });
 };
 
 const getUserInfo = async (req, res) => {
   const { _id } = req.user;
   const userData = await User.findOne({ _id }).select("-password");
-  res.json({ user: userData });
+  res.json({
+    user: {
+      _id: userData._id,
+      email: userData.email,
+      token: userData.token,
+      avatarURL: userData.avatarURL,
+      name: userData.name,
+      gender: userData.gender,
+      waterRate: userData.waterRate,
+    },
+  });
 };
 
 export default {
