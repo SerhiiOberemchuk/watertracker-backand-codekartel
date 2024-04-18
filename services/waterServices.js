@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Water from "../models/Water.js";
 import dayjs from "dayjs";
 
@@ -29,6 +28,12 @@ export const updateValueWater = async (userId, objectId, value, time) => {
   );
   const updatedObject = updateRecord.arrayValues.find(
     (obj) => obj._id.toString() === objectId
+  );
+  const newTotalWater = recalculateTotalWater(updateRecord.arrayValues);
+
+  await Water.updateOne(
+    { _id: updateRecord._id },
+    { $set: { totalWater: newTotalWater } }
   );
 
   return updatedObject;
@@ -89,7 +94,7 @@ export const addWater = async (data) => {
 // export const deleteWater = (filter) => Water.findOneAndDelete(filter);
 export const writeWaterRateInRecord = async (amountOfWater, _id) => {
   const isRecord = await checkWhetherWaterRecordExists(_id);
-  console.log(isRecord._id);
+
   if (isRecord) {
     await Water.updateOne(
       { _id: isRecord._id },

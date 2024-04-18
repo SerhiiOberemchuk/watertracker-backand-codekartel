@@ -2,7 +2,6 @@ import * as waterServices from "../services/waterServices.js";
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import User from "../models/User.js";
-import { ObjectId } from "mongodb";
 import Water from "../models/Water.js";
 
 const addWater = async (req, res) => {
@@ -44,10 +43,14 @@ const updateWater = async (req, res) => {
     value,
     time
   );
+  if (!waterRecordToUpdate) {
+    throw HttpError(404, "Water record not found");
+  }
 
-  const updatedWaterRecord = await waterRecordToUpdate.save();
-
-  res.json(waterRecordToUpdate);
+  res.json({
+    message: "Water record is updated successfuly",
+    waterRecordToUpdate,
+  });
 };
 
 // const updateWater = async (req, res) => {

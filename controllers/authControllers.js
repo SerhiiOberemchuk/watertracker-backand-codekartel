@@ -6,8 +6,7 @@ import User from "../models/User.js";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
-import fs from "fs/promises";
-import { ok } from "assert";
+
 dotenv.config();
 
 const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
