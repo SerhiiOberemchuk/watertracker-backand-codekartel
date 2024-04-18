@@ -78,7 +78,7 @@ export const addWater = async (data) => {
     });
 
     await today.save();
-    return today;
+    return today.arrayValues[today.arrayValues.length - 1];
   }
 
   const newTotalWater = arrayValues.reduce(
@@ -95,7 +95,7 @@ export const addWater = async (data) => {
     { new: true }
   );
 
-  return updated;
+  return updated.arrayValues[updated.arrayValues.length - arrayValues.length];
 };
 
 export const deleteRecordInArrey = async (userId, recordId) => {

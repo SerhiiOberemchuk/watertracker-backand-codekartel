@@ -17,7 +17,7 @@ const addWater = async (req, res) => {
   if (!result) {
     throw HttpError(404, "Not found");
   }
-  res.json(result);
+  res.json({ message: "Water record added successfuly", result });
 };
 
 export const writeWaterRateInRecord = async (amountOfWater, _id) => {
@@ -171,7 +171,10 @@ const waterRateCtrl = async (req, res, next) => {
   }
   await waterServices.writeWaterRateInRecord(amountOfWater, _id);
 
-  res.json({ updatedUser: { waterRate: updatedUser.waterRate } });
+  res.json({
+    message: "New water rate",
+    updatedUser: { waterRate: updatedUser.waterRate },
+  });
 };
 
 export default {
