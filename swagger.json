@@ -275,7 +275,7 @@
     },
     "water/today": {
       "get": {
-        "tags": ["Water"],
+        "tags": ["Today"],
         "summary": "Get today's water consumption",
         "description": "Retrieves the percentage of daily water norm consumed today along with individual records of water intake.",
         "security": [
@@ -383,124 +383,120 @@
     },
     "water/{id}": {
       "patch": {
-        "patch": {
-          "tags": ["Water"],
-          "summary": "Update a water record",
-          "description": "Updates the details of an existing water record identified by its ID, including the value and time of water intake.",
-          "security": [
-            {
-              "Bearer": []
-            }
-          ],
-          "parameters": [
-            {
-              "in": "path",
-              "name": "id",
-              "required": true,
-              "schema": {
-                "type": "string"
-              },
-              "description": "The unique identifier of the water record to update."
-            }
-          ],
-          "requestBody": {
+        "tags": ["Water"],
+        "summary": "Update a water record",
+        "description": "Updates the details of an existing water record identified by its ID, including the value and time of water intake.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
             "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the water record to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Amount of water in mililiters to update in the record.",
+                    "example": 150
+                  },
+                  "time": {
+                    "type": "string",
+                    "description": "Time of the water intake, typically in HH:mm format.",
+                    "example": "14:30"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated the water record.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "value": {
-                      "type": "number",
-                      "description": "Amount of water in mililiters to update in the record.",
-                      "example": 150
-                    },
-                    "time": {
+                    "message": {
                       "type": "string",
-                      "description": "Time of the water intake, typically in HH:mm format.",
-                      "example": "14:30"
+                      "example": "Water record is updated successfully"
+                    },
+                    "waterRecordToUpdate": {
+                      "$ref": "#/components/schemas/WaterRecord"
                     }
                   }
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Successfully updated the water record.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "Water record is updated successfully"
-                      },
-                      "waterRecordToUpdate": {
-                        "$ref": "#/components/schemas/WaterRecord"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Water record not found."
-            },
-            "401": {
-              "description": "Unauthorized. The user is not logged in or the token is invalid."
-            }
+          "404": {
+            "description": "Water record not found."
+          },
+          "401": {
+            "description": "Unauthorized. The user is not logged in or the token is invalid."
           }
         }
       },
       "delete": {
-        "delete": {
-          "tags": ["Water"],
-          "summary": "Delete a water record",
-          "description": "Deletes a specific water record by its ID and updates the total water consumed for the day accordingly.",
-          "security": [
-            {
-              "Bearer": []
-            }
-          ],
-          "parameters": [
-            {
-              "in": "path",
-              "name": "id",
-              "required": true,
-              "schema": {
-                "type": "string"
-              },
-              "description": "The unique identifier of the water record to delete."
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "The water record was deleted successfully, and the total water for the day was updated.",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "The information on the water intake below deleted successfully."
-                      },
-                      "deletedRecord": {
-                        "$ref": "#/components/schemas/WaterRecord"
-                      }
+        "tags": ["Water"],
+        "summary": "Delete a water record",
+        "description": "Deletes a specific water record by its ID and updates the total water consumed for the day accordingly.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique identifier of the water record to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The water record was deleted successfully, and the total water for the day was updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "The information on the water intake below deleted successfully."
+                    },
+                    "deletedRecord": {
+                      "$ref": "#/components/schemas/WaterRecord"
                     }
                   }
                 }
               }
-            },
-            "404": {
-              "description": "Not found. No record exists with the provided ID."
-            },
-            "401": {
-              "description": "Unauthorized. The user is not logged in or the token is invalid."
             }
+          },
+          "404": {
+            "description": "Not found. No record exists with the provided ID."
+          },
+          "401": {
+            "description": "Unauthorized. The user is not logged in or the token is invalid."
           }
         }
       }
