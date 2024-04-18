@@ -5,9 +5,6 @@ export const getWaterRecordById = async (userId) => {
   return await Water.findOne({ userId: userId });
 };
 
-// export const updateWaterToday = async (filter, data) =>
-//   await Water.findOneAndUpdate(filter, data, { new: true });
-
 export const checkWhetherWaterRecordExists = async (userId) => {
   let today = await Water.findOne({
     userId,
@@ -21,11 +18,16 @@ export const checkWhetherWaterRecordExists = async (userId) => {
 };
 
 export const updateValueWater = async (userId, objectId, value, time) => {
+  const findRecord = await checkWhetherWaterRecordExists(userId);
+
   const updateRecord = await Water.findOneAndUpdate(
-    { userId, "arrayValues._id": objectId },
+    { _id: findRecord._id, "arrayValues._id": objectId },
     { $set: { "arrayValues.$.value": value, "arrayValues.$.time": time } },
     { new: true }
   );
+  if (!updateRecord) {
+    throw new Error("Failed to update the water record.");
+  }
   const updatedObject = updateRecord.arrayValues.find(
     (obj) => obj._id.toString() === objectId
   );
@@ -91,7 +93,37 @@ export const addWater = async (data) => {
   return updated;
 };
 
-// export const deleteWater = (filter) => Water.findOneAndDelete(filter);
+export const deleteRecordInArrey = async (userId, recordId) => {
+  const record = await checkWhetherWaterRecordExists(userId);
+  if (!record) {
+    throw new Error("No record found for this user on this day.");
+  }
+  const deletedObject = record.arrayValues.find(
+    (item) => item._id.toString() === recordId
+  );
+  if (!deletedObject) {
+    return deletedObject;
+  }
+  const updatedRecord = await Water.findOneAndUpdate(
+    { _id: record._id },
+    {
+      $pull: { arrayValues: { _id: recordId } },
+      $set: {
+        totalWater:
+          recalculateTotalWater(record.arrayValues) -
+          record.arrayValues.find((val) => val._id.toString() === recordId)
+            .value,
+      },
+    },
+    { new: true }
+  );
+  if (!updatedRecord) {
+    throw new Error("Failed to update the record.");
+  }
+
+  return deletedObject;
+};
+
 export const writeWaterRateInRecord = async (amountOfWater, _id) => {
   const isRecord = await checkWhetherWaterRecordExists(_id);
 
