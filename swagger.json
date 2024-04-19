@@ -295,7 +295,7 @@
                       "type": "number",
                       "description": "The percentage of daily water norm that has been consumed today."
                     },
-                    "arrayValues": {
+                    "arreyWaterRecords": {
                       "type": "array",
                       "description": "List of water consumption records for today.",
                       "items": {
@@ -361,7 +361,7 @@
                       "type": "string",
                       "example": "Water record added successfully"
                     },
-                    "result": {
+                    "addedWaterRecord": {
                       "$ref": "#/components/schemas/WaterRecord"
                     }
                   }
@@ -436,7 +436,7 @@
                       "type": "string",
                       "example": "Water record is updated successfully"
                     },
-                    "waterRecordToUpdate": {
+                    "updatedWaterRecord": {
                       "$ref": "#/components/schemas/WaterRecord"
                     }
                   }
@@ -484,7 +484,7 @@
                       "type": "string",
                       "example": "The information on the water intake below deleted successfully."
                     },
-                    "deletedRecord": {
+                    "deletedWaterRecord": {
                       "$ref": "#/components/schemas/WaterRecord"
                     }
                   }
