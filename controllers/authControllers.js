@@ -102,9 +102,25 @@ export const updateAvatar = async (req, res, next) => {
 const updateUserInfo = async (req, res) => {
   const { _id: userId } = req.user;
   const updateData = { ...req.body };
-  if (updateData.password) {
-    updateData.password = await bcrypt.hash(updateData.password, 10);
+
+  if (updateData.newPassword) {
+    const { oldPassword, newPassword } = updateData;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw HttpError(404, "User not found");
+    }
+
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!passwordMatch) {
+      throw HttpError(400, "Current password is incorrect");
+    }
+
+    updateData.password = await bcrypt.hash(newPassword, 10);
   }
+
   const result = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
   }).select("-password");
@@ -113,15 +129,7 @@ const updateUserInfo = async (req, res) => {
     throw HttpError(404, "Not found");
   }
 
-  res.json({
-    _id: result._id,
-    email: result.email,
-    token: result.token,
-    avatarURL: result.avatarURL,
-    name: result.name,
-    gender: result.gender,
-    waterRate: result.waterRate,
-  });
+  res.json({ message: "Password updated successfully", user: result });
 };
 
 const getUserInfo = async (req, res) => {
