@@ -176,7 +176,7 @@ const waterRateCtrl = async (req, res, next) => {
 
   res.json({
     message: "New water rate",
-    updatedUser: { waterRate: updatedUser.waterRate },
+    waterRate: updatedUser.waterRate,
   });
 };
 
