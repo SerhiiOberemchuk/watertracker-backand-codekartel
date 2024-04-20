@@ -4,6 +4,7 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import dotenv from "dotenv";
+import sendEmail from "../helpers/sendEmail.js";
 
 dotenv.config();
 
@@ -90,6 +91,30 @@ const signIn = async (req, res) => {
   });
 };
 
+const sendMailRestore = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ message: "Missing required field email" });
+  }
+
+  const isUserWithEmail = await User.findOne({ email });
+  if (!isUserWithEmail) {
+    throw HttpError(404, "User not found or email is wrong!!!");
+  }
+
+  const toEmail = {
+    to: email,
+    subject: "Restore password",
+    html: `<a href="http://water-tracker-frontend/update-password" target="_blank">Click to restore your password</a> `,
+  };
+
+  await sendEmail(toEmail);
+
+  res.status(201).json({
+    message: `Message sent to ${email}`,
+  });
+};
+
 const logOut = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: null });
@@ -168,6 +193,7 @@ const getUserInfo = async (req, res) => {
 export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
+  sendMailRestore: ctrWrapper(sendMailRestore),
   logOut: ctrWrapper(logOut),
   updateAvatar: ctrWrapper(updateAvatar),
   updateUserInfo: ctrWrapper(updateUserInfo),

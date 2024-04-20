@@ -6,6 +6,7 @@ import upload from "../middlewares/upload.js";
 import {
   userSignUpAndLoginSchema,
   updateUserInfoSchema,
+  userEmailSchema,
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -22,6 +23,11 @@ authRouter.post(
   "/login",
   validateBody(userSignUpAndLoginSchema),
   authController.signIn
+);
+authRouter.post(
+  "/restore",
+  validateBody(userEmailSchema),
+  authController.sendMailRestore
 );
 
 authRouter.post("/logout", authenticate, authController.logOut);
