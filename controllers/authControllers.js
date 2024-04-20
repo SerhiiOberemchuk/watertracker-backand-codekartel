@@ -4,17 +4,10 @@ import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import path, { dirname } from "path";
 
 dotenv.config();
 
 const { JWT_SECRET, JWT_EXPIRES_IN } = process.env;
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const signUp = async (req, res, next) => {
   const { email, password } = req.body;
@@ -33,10 +26,23 @@ const signUp = async (req, res, next) => {
   });
 
   await newUser.save();
+  const payload = {
+    id: newUser._id,
+  };
 
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  await User.findOneAndUpdate(newUser._id, { token });
   res.status(201).json({
     message: "Congratulations! You have successfully registered!",
-    email: newUser.email,
+    newUser: {
+      _id: newUser._id,
+      email: newUser.email,
+      token,
+      avatarURL: newUser.avatarURL,
+      name: newUser.name,
+      gender: newUser.gender,
+      waterRate: newUser.waterRate,
+    },
   });
 };
 
