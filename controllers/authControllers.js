@@ -25,23 +25,27 @@ const signUp = async (req, res, next) => {
     password: hashedPassword,
   });
 
-  await newUser.save();
   const payload = {
     id: newUser._id,
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-  await User.findOneAndUpdate(newUser._id, { token });
+  const updatedUser = await User.findOneAndUpdate(
+    newUser._id,
+    { token },
+    { new: true }
+  );
+
   res.status(201).json({
     message: "Congratulations! You have successfully registered!",
     newUser: {
-      _id: newUser._id,
-      email: newUser.email,
+      _id: updatedUser._id,
+      email: updatedUser.email,
       token,
-      avatarURL: newUser.avatarURL,
-      name: newUser.name,
-      gender: newUser.gender,
-      waterRate: newUser.waterRate,
+      avatarURL: updatedUser.avatarURL,
+      name: updatedUser.name,
+      gender: updatedUser.gender,
+      waterRate: updatedUser.waterRate,
     },
   });
 };
