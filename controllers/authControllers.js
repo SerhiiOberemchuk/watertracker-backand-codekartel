@@ -104,8 +104,8 @@ const sendMailRestore = async (req, res) => {
 
   const toEmail = {
     to: email,
-    subject: "Restore password",
-    html: `<a href="http://water-tracker-frontend/update-password" target="_blank">Click to restore your password</a> `,
+    subject: "Restore Password",
+    html: "We received a request to reset your password for your WaterTracker account. If you did not make this request, please ignore this email. Otherwise, you can reset your password using the link below:<br><br><a href='http://water-tracker-frontend/update-password' target='_blank'>Click here to restore your password</a><br><br>This link will expire in 24 hours for security reasons.<br><br>If you are having trouble clicking the link, copy and paste the URL directly into your browser. If you continue to have problems resetting your password, please contact our support team.<br><br>Thank you,<br>WaterTracker Support Team",
   };
 
   await sendEmail(toEmail);
