@@ -105,7 +105,7 @@
         }
       }
     },
-    "users/restore": {
+    "/users/restore": {
       "post": {
         "tags": ["Auth"],
         "summary": "Send password restore email",
@@ -278,7 +278,7 @@
         }
       }
     },
-    "users/update": {
+    "/users/update": {
       "patch": {
         "tags": ["User"],
         "summary": "Update user data",
@@ -315,7 +315,7 @@
         }
       }
     },
-    "users/info": {
+    "/users/info": {
       "get": {
         "tags": ["User"],
         "summary": "Get user information",
@@ -341,7 +341,7 @@
         }
       }
     },
-    "water/today": {
+    "/water/today": {
       "get": {
         "tags": ["Today"],
         "summary": "Get today's water consumption",
@@ -384,7 +384,7 @@
         }
       }
     },
-    "water/add": {
+    "/water/add": {
       "post": {
         "tags": ["Water"],
         "summary": "Add a water record",
@@ -449,7 +449,7 @@
         }
       }
     },
-    "water/{id}": {
+    "/water/{id}": {
       "patch": {
         "tags": ["Water"],
         "summary": "Update a water record",
@@ -569,7 +569,7 @@
         }
       }
     },
-    "water/calc": {
+    "/water/calc": {
       "patch": {
         "tags": ["WaterRate"],
         "summary": "Update user's daily water consumption rate",
