@@ -102,8 +102,9 @@ export const updateAvatar = async (req, res, next) => {
 const updateUserInfo = async (req, res) => {
   const { _id: userId } = req.user;
   const updateData = { ...req.body };
+  let passwordUpdated = false;
 
-  if (updateData.newPassword) {
+  if (updateData.oldPassword && updateData.newPassword) {
     const { oldPassword, newPassword } = updateData;
 
     const user = await User.findById(userId);
@@ -119,6 +120,7 @@ const updateUserInfo = async (req, res) => {
     }
 
     updateData.password = await bcrypt.hash(newPassword, 10);
+    passwordUpdated = true;
   }
 
   const result = await User.findByIdAndUpdate(userId, updateData, {
@@ -129,7 +131,12 @@ const updateUserInfo = async (req, res) => {
     throw HttpError(404, "Not found");
   }
 
-  res.json({ message: "Password updated successfully", user: result });
+  let message = "User information updated successfully";
+  if (passwordUpdated) {
+    message += ", including password";
+  }
+
+  res.json({ message, user: result });
 };
 
 const getUserInfo = async (req, res) => {
