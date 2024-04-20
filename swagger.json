@@ -105,6 +105,74 @@
         }
       }
     },
+    "users/restore": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Send password restore email",
+        "description": "Sends an email to the user with a link to restore their password if the provided email is associated with an account.",
+        "requestBody": {
+          "description": "Email of the user who wants to restore their password",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Email successfully sent to the user's email address.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Message sent to example@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required field email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing required field email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found or email is wrong",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User not found or email is wrong!!!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/logout": {
       "post": {
         "tags": ["Auth"],
@@ -695,6 +763,17 @@
               "description": "The number of times there were records of water consumption",
               "example": "6"
             }
+          }
+        }
+      },
+      "UserEmailRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address of the user requesting password restoration"
           }
         }
       },

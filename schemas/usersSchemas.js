@@ -13,3 +13,7 @@ export const updateUserInfoSchema = Joi.object({
   gender: Joi.string().valid("male", "female"),
   name: Joi.string().max(32),
 });
+
+export const userEmailSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
