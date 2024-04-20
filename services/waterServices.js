@@ -148,6 +148,10 @@ export const getWaterRecordsToday = async (userId) => {
     date: { $gte: dayjs().startOf("day"), $lte: dayjs().endOf("day") },
   });
 
+  if (!waterRecordsToday) {
+    return waterRecordsToday;
+  }
+
   const { arrayValues, totalWater, waterRate } = waterRecordsToday;
 
   const percentOfDailyNorm = Math.round((totalWater / waterRate / 1000) * 100);

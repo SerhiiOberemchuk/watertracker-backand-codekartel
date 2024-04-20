@@ -4,11 +4,12 @@ import HttpError from "../helpers/HttpError.js";
 
 const getPercentOfDailyNorm = async (req, res) => {
   const { _id: userId } = req.user;
-  const { percentOfDailyNorm, arrayValues } =
-    await waterServices.getWaterRecordsToday(userId);
-  if (arrayValues.length === 0) {
-    throw HttpError(404, "Not found");
+
+  const myRecords = await waterServices.getWaterRecordsToday(userId);
+  if (!myRecords || myRecords.arrayValues.length === 0) {
+    throw HttpError(404, "Not found records for today");
   }
+  const { percentOfDailyNorm, arrayValues } = myRecords;
   res.json({
     percentOfDailyNorm: percentOfDailyNorm,
     arreyWaterRecords: arrayValues,
