@@ -35,6 +35,11 @@ authRouter.post(
   validateBody(resetPasswordSchema),
   authController.resetPassword
 );
+authRouter.post(
+  "/recover",
+  validateBody(userEmailSchema),
+  authController.recoverPassword
+);
 
 authRouter.post("/logout", authenticate, authController.logOut);
 
