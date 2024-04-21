@@ -107,7 +107,7 @@ const sendMailRestore = async (req, res) => {
   const updatedUser = await User.findOneAndUpdate(
     isUserWithEmail._id,
     {
-      token,
+      passwordResetToken: token,
     },
     { new: true }
   );
@@ -124,8 +124,25 @@ const sendMailRestore = async (req, res) => {
 
   res.status(201).json({
     message: `Message sent to email: ${email}`,
-    token: updatedUser.token,
+    token: updatedUser.passwordResetToken,
   });
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  const user = await User.findOne({ passwordResetToken: token });
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  user.passwordResetToken = null;
+  await user.save();
+
+  res
+    .status(200)
+    .json({ message: "Your password has been changed successfully" });
 };
 
 const logOut = async (req, res) => {
@@ -207,6 +224,7 @@ export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
   sendMailRestore: ctrWrapper(sendMailRestore),
+  resetPassword: ctrWrapper(resetPassword),
   logOut: ctrWrapper(logOut),
   updateAvatar: ctrWrapper(updateAvatar),
   updateUserInfo: ctrWrapper(updateUserInfo),

@@ -177,6 +177,50 @@
         }
       }
     },
+    "/reset-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Reset user password",
+        "description": "Allows users to reset their password using a valid reset token they received by email.",
+        "requestBody": {
+          "description": "New password details",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Your password has been changed successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found with the given token.",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad request if the required fields are missing.",
+            "content": {}
+          }
+        }
+      }
+    },
     "/users/logout": {
       "post": {
         "tags": ["Auth"],
@@ -781,7 +825,20 @@
           }
         }
       },
-      "WaterResponse": {},
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": ["token", "newPassword"],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The reset token received by email."
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "The new password for the user account."
+          }
+        }
+      },
       "UserInfoResponse": {
         "type": "object",
         "properties": {

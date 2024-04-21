@@ -34,6 +34,7 @@ const userSchema = new Schema(
       type: Number,
       default: 2,
     },
+    passwordResetToken: { type: String, default: null },
   },
   { versionKey: false }
 );

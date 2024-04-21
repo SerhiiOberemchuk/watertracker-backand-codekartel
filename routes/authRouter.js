@@ -7,6 +7,7 @@ import {
   userSignUpAndLoginSchema,
   updateUserInfoSchema,
   userEmailSchema,
+  resetPasswordSchema,
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -28,6 +29,11 @@ authRouter.post(
   "/restore",
   validateBody(userEmailSchema),
   authController.sendMailRestore
+);
+authRouter.post(
+  "/reset-password",
+  validateBody(resetPasswordSchema),
+  authController.resetPassword
 );
 
 authRouter.post("/logout", authenticate, authController.logOut);
