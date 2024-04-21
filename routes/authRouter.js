@@ -25,16 +25,17 @@ authRouter.post(
   validateBody(userSignUpAndLoginSchema),
   authController.signIn
 );
-authRouter.post(
-  "/restore",
-  validateBody(userEmailSchema),
-  authController.sendMailRestore
-);
-authRouter.post(
-  "/reset-password",
-  validateBody(resetPasswordSchema),
-  authController.resetPassword
-);
+
+// authRouter.post(
+//   "/restore",
+//   validateBody(userEmailSchema),
+//   authController.sendMailRestore
+// );
+// authRouter.post(
+//   "/reset-password",
+//   validateBody(resetPasswordSchema),
+//   authController.resetPassword
+// );
 
 authRouter.post("/logout", authenticate, authController.logOut);
 
