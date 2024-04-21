@@ -124,7 +124,7 @@ const sendMailRestore = async (req, res) => {
 
   res.status(201).json({
     message: `Message sent to email: ${email}`,
-    token: updatedUser.passwordResetToken,
+    passwordResetToken: updatedUser.passwordResetToken,
   });
 };
 
