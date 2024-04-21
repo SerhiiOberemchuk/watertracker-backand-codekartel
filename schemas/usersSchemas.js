@@ -17,3 +17,7 @@ export const updateUserInfoSchema = Joi.object({
 export const userEmailSchema = Joi.object({
   email: Joi.string().email().required(),
 });
+export const resetPasswordSchema = Joi.object({
+  newPassword: Joi.string().min(8).max(16).required(),
+  token: Joi.string().required(),
+});
