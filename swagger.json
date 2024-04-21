@@ -132,6 +132,10 @@
                     "message": {
                       "type": "string",
                       "example": "Message sent to example@example.com"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "12345678.123456783.123456788"
                     }
                   }
                 }
