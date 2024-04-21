@@ -128,21 +128,37 @@ const sendMailRestore = async (req, res) => {
   });
 };
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
   const { token, newPassword } = req.body;
-  const user = await User.findOne({ passwordResetToken: token });
-  if (!user) {
-    throw HttpError(404, "User not found");
+  try {
+    const { _id } = jwt.verify(token, JWT_SECRET);
+
+    const user = await User.findOne({ _id });
+    if (!user) {
+      next(HttpError(404, "User not found"));
+    }
+    if (token !== user.passwordResetToken) {
+      next(HttpError(400, "Invalid or expired reset token"));
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    user.passwordResetToken = null;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Your password has been changed successfully" });
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({
+        message:
+          "The reset link has expired. Please request a new password reset.",
+      });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  user.password = hashedPassword;
-  user.passwordResetToken = null;
-  await user.save();
-
-  res
-    .status(200)
-    .json({ message: "Your password has been changed successfully" });
 };
 
 const logOut = async (req, res) => {
