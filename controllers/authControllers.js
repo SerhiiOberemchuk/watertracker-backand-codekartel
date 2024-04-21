@@ -112,7 +112,7 @@ const sendMailRestore = async (req, res) => {
     { new: true }
   );
 
-  const passwordPageLink = `"https://${BASE_URL}/water-tracker-frontend/update-password/${token}"`;
+  const passwordPageLink = `"https://${BASE_URL}/water-tracker-frontend/update-password"`;
 
   const toEmail = {
     to: email,
