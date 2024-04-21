@@ -184,37 +184,69 @@ const updateUserInfo = async (req, res) => {
   const { _id: userId } = req.user;
   const updateData = { ...req.body };
   let passwordUpdated = false;
+  let passwordUpdateError = "";
 
-  if (updateData.oldPassword && updateData.newPassword) {
-    const { oldPassword, newPassword } = updateData;
+  if (updateData.newPassword && !updateData.oldPassword) {
+    passwordUpdateError =
+      "the current password is required to change the password. ";
+  } else if (updateData.oldPassword) {
+    const { oldPassword } = updateData;
 
     const user = await User.findById(userId);
 
     if (!user) {
-      throw HttpError(404, "User not found");
+      passwordUpdateError = "User not found. ";
+    } else {
+      const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+      if (!passwordMatch) {
+        passwordUpdateError =
+          "the current password is incorrect. Please, double check the current password.";
+      } else if (updateData.newPassword) {
+        const { newPassword } = updateData;
+        updateData.password = await bcrypt.hash(newPassword, 10);
+        passwordUpdated = true;
+      } else {
+        passwordUpdateError = "the new password is required. ";
+      }
     }
-
-    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-
-    if (!passwordMatch) {
-      throw HttpError(400, "Current password is incorrect");
-    }
-
-    updateData.password = await bcrypt.hash(newPassword, 10);
-    passwordUpdated = true;
   }
 
-  const result = await User.findByIdAndUpdate(userId, updateData, {
-    new: true,
-  }).select("-password");
+  delete updateData.oldPassword;
+  delete updateData.newPassword;
 
-  if (!result) {
-    throw HttpError(404, "Not found");
+  let message = "";
+  let result;
+
+  if (Object.keys(updateData).length > 0 || passwordUpdated) {
+    result = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password");
+
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
+
+    message = "User information updated successfully";
+  } else {
+    message = "No user information was updated";
   }
 
-  let message = "User information updated successfully";
   if (passwordUpdated) {
     message += ", including password";
+  }
+
+  if (passwordUpdateError) {
+    if (passwordUpdateError === "the current password is incorrect. ") {
+      message = "Password was not updated because " + passwordUpdateError;
+    } else if (message === "No user information was updated") {
+      message +=
+        ". The password was not updated because " + passwordUpdateError;
+    } else {
+      message +=
+        ". However, the password was not updated because " +
+        passwordUpdateError;
+    }
   }
 
   res.json({ message, user: result });
