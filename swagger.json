@@ -385,7 +385,7 @@
     "/users/update": {
       "patch": {
         "tags": ["User"],
-        "summary": "Update user data",
+        "summary": "Update user's profile information",
         "description": "Allows authenticated users to update their profile information such as email, name, and password.",
         "security": [{ "Bearer": [] }],
         "requestBody": {
@@ -408,13 +408,16 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters or missing required fields."
+            "description": "Bad Request - Errors related to invalid input or missing required fields"
           },
           "401": {
-            "description": "Unauthorized. The user is not logged in or the token is invalid."
+            "description": "Unauthorized - Current password is incorrect"
           },
           "404": {
-            "description": "User not found."
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error - Issues with the server"
           }
         }
       }
@@ -806,19 +809,63 @@
           "email": {
             "type": "string",
             "format": "email",
-            "description": "User's new email address"
+            "description": "New email address for the user"
+          },
+          "oldPassword": {
+            "type": "string",
+            "format": "password",
+            "description": "Current password (required for changing password)"
+          },
+          "newPassword": {
+            "type": "string",
+            "format": "password",
+            "description": "New password for the user"
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["male", "female"],
+            "description": "User's gender"
           },
           "name": {
             "type": "string",
             "description": "User's full name"
-          },
-          "other": {
-            "type": "string",
-            "description": "other"
           }
         }
       },
-      "UserUpdateResponse": {},
+      "UserUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User information updated successfully, including password"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "User ID"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email address"
+              },
+              "gender": {
+                "type": "string",
+                "description": "User's gender"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's full name"
+              },
+              "waterRate": {
+                "type": "number",
+                "description": "User's daily water consumption rate in liters"
+              }
+            }
+          }
+        }
+      },
       "AvatarsRequest": {
         "type": "object",
         "properties": {
