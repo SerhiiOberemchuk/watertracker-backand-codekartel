@@ -36,7 +36,12 @@ authRouter.post(
   authController.resetPassword
 );
 authRouter.post(
-  "/recover",
+  "/forgot-password",
+  validateBody(userEmailSchema),
+  authController.forgotPassword
+);
+authRouter.post(
+  "/recover-password",
   validateBody(userEmailSchema),
   authController.recoverPassword
 );
