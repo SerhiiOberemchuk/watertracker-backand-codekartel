@@ -8,6 +8,7 @@ import {
   updateUserInfoSchema,
   userEmailSchema,
   resetPasswordSchema,
+  recoverPasswordSchema,
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -34,6 +35,16 @@ authRouter.post(
   "/reset-password",
   validateBody(resetPasswordSchema),
   authController.resetPassword
+);
+authRouter.post(
+  "/forgot-password",
+  validateBody(userEmailSchema),
+  authController.forgotPassword
+);
+authRouter.post(
+  "/recover-password",
+  validateBody(recoverPasswordSchema),
+  authController.recoverPassword
 );
 
 authRouter.post("/logout", authenticate, authController.logOut);

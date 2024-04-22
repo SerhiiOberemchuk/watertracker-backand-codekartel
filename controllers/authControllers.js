@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import dotenv from "dotenv";
 import sendEmail from "../helpers/sendEmail.js";
+import { customAlphabet } from 'nanoid'
 
 dotenv.config();
 
@@ -125,6 +126,60 @@ const sendMailRestore = async (req, res) => {
   res.status(201).json({
     message: `Message sent to email: ${email}`,
     passwordResetToken: updatedUser.passwordResetToken,
+  });
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: "Missing required field email" });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw HttpError(404, "User not found or email is wrong!!!");
+  }
+
+  const nanoid = customAlphabet('1234567890qwertyuiopasdfghjklzxcvbnm', 16)
+  const passwordResetToken = nanoid()
+
+  user.passwordResetToken = passwordResetToken;
+  await user.save()
+
+  const passwordResetLink = `"https://${BASE_URL}/water-tracker-frontend/forgot-password/${passwordResetToken}"`;
+
+  const toEmail = {
+    to: email,
+    subject: "Restore Password",
+    html: `We received a request to reset your password for your WaterTracker account. Your password reset link: ${passwordResetLink}`,
+  };
+
+  await sendEmail(toEmail);
+
+  res.status(200).json({
+    message: `Message sent to email: ${email}`,
+  });
+};
+
+const recoverPassword = async (req, res) => {
+  const { password, token } = req.body;
+  if (!password || !token) {
+    return res.status(400).json({ message: "Bad request" });
+  }
+
+  const user = await User.findOne({ passwordResetToken: token });
+  if (!user) {
+    return res.status(400).json({ message: "Bad request" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  user.passwordResetToken = null;
+
+  await user.save()
+
+  res.status(200).json({
+    message: `Password changed to: ${user.email}`,
   });
 };
 
@@ -261,4 +316,6 @@ export default {
   updateAvatar: ctrWrapper(updateAvatar),
   updateUserInfo: ctrWrapper(updateUserInfo),
   getUserInfo: ctrWrapper(getUserInfo),
+  forgotPassword: ctrWrapper(forgotPassword),
+  recoverPassword: ctrWrapper(recoverPassword),
 };
