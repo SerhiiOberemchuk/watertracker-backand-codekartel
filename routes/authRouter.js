@@ -65,4 +65,8 @@ authRouter.patch(
 
 authRouter.get("/info", authenticate, authController.getUserInfo);
 
+authRouter.get("/google", authController.googleAuth);
+
+authRouter.get("/google-redirect", authController.googleRedirect);
+
 export default authRouter;
