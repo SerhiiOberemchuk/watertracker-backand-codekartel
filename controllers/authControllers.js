@@ -172,13 +172,14 @@ const recoverPassword = async (req, res) => {
     return res.status(400).json({ message: "Bad request" });
   }
 
-  user.password = password;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
   user.passwordResetToken = null;
 
-  await userWithEmail.save()
+  await user.save()
 
   res.status(200).json({
-    message: `Password changed to: ${email}`,
+    message: `Password changed to: ${user.email}`,
   });
 };
 

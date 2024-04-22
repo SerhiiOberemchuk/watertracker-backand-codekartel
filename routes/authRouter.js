@@ -8,6 +8,7 @@ import {
   updateUserInfoSchema,
   userEmailSchema,
   resetPasswordSchema,
+  recoverPasswordSchema,
 } from "../schemas/usersSchemas.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -42,7 +43,7 @@ authRouter.post(
 );
 authRouter.post(
   "/recover-password",
-  validateBody(userEmailSchema),
+  validateBody(recoverPasswordSchema),
   authController.recoverPassword
 );
 
