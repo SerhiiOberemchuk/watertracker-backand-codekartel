@@ -39,8 +39,9 @@
       "post": {
         "tags": ["Auth"],
         "summary": "user registration",
+        "description": "Creates a new user account with the provided email and password.",
         "requestBody": {
-          "description": "Registration's object",
+          "description": "User's email and password",
           "required": true,
           "content": {
             "application/json": {
@@ -61,12 +62,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request (invalid request body)",
+          "409": {
+            "description": "Email in use",
             "content": {}
           },
-          "409": {
-            "description": "Provided email already exists",
+          "400": {
+            "description": "Invalid request data",
             "content": {}
           }
         }
@@ -177,7 +178,7 @@
         }
       }
     },
-    "/users/reset-password": {
+    "/users/reset-password/{token}": {
       "post": {
         "tags": ["Auth"],
         "summary": "Reset user password",
@@ -312,7 +313,12 @@
             "name": "date",
             "required": "true",
             "type": "string",
-            "description": "users year and month"
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "example": "2024-04"
+            },
+            "description": "Year and month input formatted as YYYY-MM"
           }
         ],
         "responses": {
@@ -426,11 +432,11 @@
       "get": {
         "tags": ["User"],
         "summary": "Get user information",
-        "description": "Retrieves detailed information about the user based on their authentication token.",
+        "description": "Retrieves the authenticated user's personal information.",
         "security": [{ "Bearer": [] }],
         "responses": {
           "200": {
-            "description": "Successfully retrieved user information.",
+            "description": "Successful retrieval of user information.",
             "content": {
               "application/json": {
                 "schema": {
@@ -745,23 +751,55 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's email",
-            "format": "email"
+            "format": "email",
+            "description": "Email address for user registration"
           },
           "password": {
             "type": "string",
-            "description": "User's password",
-            "example": "qwerty123"
+            "format": "password",
+            "description": "Password for user registration"
           }
         }
       },
       "RegistrationResponse": {
         "type": "object",
         "properties": {
-          "email": {
+          "message": {
             "type": "string",
-            "description": "User's email",
-            "format": "email"
+            "example": "Congratulations! You have successfully registered!"
+          },
+          "newUser": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Unique identifier for the user."
+              },
+              "email": {
+                "type": "string",
+                "description": "Email address of the user."
+              },
+              "token": {
+                "type": "string",
+                "description": "JWT token for the user."
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "URL of the user's avatar image, if any."
+              },
+              "name": {
+                "type": "string",
+                "description": "Full name of the user."
+              },
+              "gender": {
+                "type": "string",
+                "description": "Gender of the user."
+              },
+              "waterRate": {
+                "type": "number",
+                "description": "User's daily water rate in liters."
+              }
+            }
           }
         }
       },
@@ -945,17 +983,45 @@
       "UserInfoResponse": {
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "description": "Unique identifier for the user."
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email address."
-          },
-          "name": {
-            "type": "string",
-            "description": "User's full name."
+          "user": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "6625111cca51ed42cd525bb5",
+                "description": "Unique identifier for the user."
+              },
+              "email": {
+                "type": "string",
+                "example": "name@gmail.com",
+                "description": "Email address of the user."
+              },
+              "token": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MjUxMTFjY2E1MWVkNDJjZDUyNWJiNSIsImlhdCI6MTcxMzcwNTI0NCwiZXhwIjoxNzEzNzg4MDQ0fQ.HwzUXt6BtaxUsQ4W8FknIE-0j7vfOw12Bh7ANUQxhwM",
+                "description": "JWT token for the user."
+              },
+              "avatarURL": {
+                "type": "string",
+                "example": null,
+                "description": "URL of the user's avatar image, if any."
+              },
+              "name": {
+                "type": "string",
+                "example": null,
+                "description": "Full name of the user."
+              },
+              "gender": {
+                "type": "string",
+                "example": "other",
+                "description": "Gender of the user."
+              },
+              "waterRate": {
+                "type": "number",
+                "example": 2,
+                "description": "User's daily water rate in liters."
+              }
+            }
           }
         }
       },
