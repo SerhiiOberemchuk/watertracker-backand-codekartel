@@ -19,9 +19,9 @@ export const checkWhetherWaterRecordExists = async (userId) => {
 
 export const updateValueWater = async (userId, objectId, value, time) => {
   const findRecord = await checkWhetherWaterRecordExists(userId);
-  const objectToUpdate = findRecord.arrayValues.find(
-    (item) => item._id.toString() === objectId
-  );
+  console.log(findRecord);
+  const objectToUpdate = Water.findOne({ "arrayValues._id": objectId });
+
   if (!objectToUpdate) {
     return objectToUpdate;
   }
