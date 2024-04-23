@@ -92,43 +92,6 @@ const signIn = async (req, res) => {
   });
 };
 
-const sendMailRestore = async (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    res.status(400).json({ message: "Missing required field email" });
-  }
-
-  const isUserWithEmail = await User.findOne({ email });
-  if (!isUserWithEmail) {
-    throw HttpError(404, "User not found or email is wrong!!!");
-  }
-
-  const payload = { _id: isUserWithEmail._id };
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-  const updatedUser = await User.findOneAndUpdate(
-    isUserWithEmail._id,
-    {
-      passwordResetToken: token,
-    },
-    { new: true }
-  );
-
-  const passwordPageLink = `"https://${BASE_URL}/water-tracker-frontend/update-password"`;
-
-  const toEmail = {
-    to: email,
-    subject: "Restore Password",
-    html: `We received a request to reset your password for your WaterTracker account. If you did not make this request, please ignore this email. Otherwise, you can reset your password using the link below:<br><br><a href=${passwordPageLink}  target='_blank'>Click here to restore your password</a><br><br>This link will expire in 23 hours for security reasons.<br><br>If you are having trouble clicking the link, copy and paste the URL directly into your browser. If you continue to have problems resetting your password, please contact our support team.<br><br>Thank you,<br>WaterTracker Support Team`,
-  };
-
-  await sendEmail(toEmail);
-
-  res.status(201).json({
-    message: `Message sent to email: ${email}`,
-    passwordResetToken: updatedUser.passwordResetToken,
-  });
-};
-
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!email) {
@@ -310,7 +273,6 @@ const getUserInfo = async (req, res) => {
 export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
-  sendMailRestore: ctrWrapper(sendMailRestore),
   resetPassword: ctrWrapper(resetPassword),
   logOut: ctrWrapper(logOut),
   updateAvatar: ctrWrapper(updateAvatar),

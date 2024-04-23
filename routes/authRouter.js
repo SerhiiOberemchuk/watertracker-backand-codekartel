@@ -27,11 +27,6 @@ authRouter.post(
   authController.signIn
 );
 authRouter.post(
-  "/restore",
-  validateBody(userEmailSchema),
-  authController.sendMailRestore
-);
-authRouter.post(
   "/reset-password",
   validateBody(resetPasswordSchema),
   authController.resetPassword
