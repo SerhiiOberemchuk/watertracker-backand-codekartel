@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import axios from "axios";
 import HttpError from "../helpers/HttpError.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
 import bcrypt from "bcrypt";
@@ -7,7 +8,6 @@ import dotenv from "dotenv";
 import sendEmail from "../helpers/sendEmail.js";
 import { customAlphabet } from 'nanoid';
 import queryString from 'query-string';
-// import { URL } from 'url';
 
 dotenv.config();
 
@@ -312,7 +312,7 @@ const getUserInfo = async (req, res) => {
 const googleAuth = async (req, res) => {
   const stringifiedParams = queryString.stringify({
     client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+    redirect_uri: `${process.env.BACKEND_URL}/users/google-redirect`,
     scope: [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile",
@@ -339,7 +339,7 @@ const googleRedirect = async (req, res) => {
     data: {
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `${process.env.BASE_URL}/auth/google-redirect`,
+      redirect_uri: `${process.env.BACKEND_URL}/users/google-redirect`,
       grant_type: "authorization_code",
       code,
     },
@@ -352,14 +352,53 @@ const googleRedirect = async (req, res) => {
       Authorization: `Bearer ${tokenData.data.access_token}`,
     },
   });
-  // userData.data.email
-  // ...
-  // ...
-  // ...
+
+  const {email, name, picture} = userData.data;
+
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = new User()
+    const nanoid = customAlphabet('1234567890qwertyuiopasdfghjklzxcvbnm', 16)
+    const password = nanoid()
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword
+  }
+
+  user.email = email;
+  user.name = name;
+  user.avatarURL = picture;
+  await user.save()
+
+  const payload = {
+    id: user._id,
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    { token },
+    { new: true }
+  ).select("-password");
+
+  // res.status(200).json({
+  //   message: "Congratulations! Login successful!",
+
+  //   user: {
+  //     _id: updatedUser._id,
+  //     email: updatedUser.email,
+  //     token: updatedUser.token,
+  //     avatarURL: updatedUser.avatarURL,
+  //     name: updatedUser.name,
+  //     gender: updatedUser.gender,
+  //     waterRate: updatedUser.waterRate,
+  //   },
+  // });
+
   return res.redirect(
-    `${process.env.BASE_URL}?token=${userData.data.token}`
+    `${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
   );
-};
+}
 
 export default {
   signUp: ctrWrapper(signUp),
@@ -374,4 +413,4 @@ export default {
   recoverPassword: ctrWrapper(recoverPassword),
   googleAuth: ctrWrapper(googleAuth),
   googleRedirect: ctrWrapper(googleRedirect),
-};
+}
