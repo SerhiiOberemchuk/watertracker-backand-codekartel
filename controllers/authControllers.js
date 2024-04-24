@@ -325,12 +325,13 @@ const googleRedirect = async (req, res) => {
     const password = nanoid();
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
+    user.email = email;
+    user.name = name;
+    user.avatarURL = picture;
+    await user.save();
   }
 
-  user.email = email;
-  user.name = name;
-  user.avatarURL = picture;
-  await user.save();
+
 
   const payload = {
     id: user._id,
