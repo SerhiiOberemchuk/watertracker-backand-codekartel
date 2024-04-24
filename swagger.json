@@ -907,13 +907,33 @@
           "user": {
             "type": "object",
             "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Unique identifier for the user."
+              },
+              "email": {
+                "type": "string",
+                "description": "Email address of the user."
+              },
+              "token": {
+                "type": "string",
+                "description": "JWT token for the user."
+              },
+              "avatarURL": {
+                "type": "string",
+                "description": "URL of the user's avatar image, if any."
+              },
               "name": {
                 "type": "string",
-                "example": "user`s name"
+                "description": "Full name of the user."
               },
-              "id": {
+              "gender": {
                 "type": "string",
-                "example": "125fggfb545bgd"
+                "description": "Gender of the user."
+              },
+              "waterRate": {
+                "type": "number",
+                "description": "User's daily water rate in liters."
               }
             }
           }
