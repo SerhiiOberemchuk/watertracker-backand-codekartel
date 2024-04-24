@@ -6,8 +6,8 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import dotenv from "dotenv";
 import sendEmail from "../helpers/sendEmail.js";
-import { customAlphabet } from 'nanoid';
-import queryString from 'query-string';
+import { customAlphabet } from "nanoid";
+import queryString from "query-string";
 
 dotenv.config();
 
@@ -105,11 +105,11 @@ const forgotPassword = async (req, res) => {
     throw HttpError(404, "User not found or email is wrong!!!");
   }
 
-  const nanoid = customAlphabet('1234567890qwertyuiopasdfghjklzxcvbnm', 16)
-  const passwordResetToken = nanoid()
+  const nanoid = customAlphabet("1234567890qwertyuiopasdfghjklzxcvbnm", 16);
+  const passwordResetToken = nanoid();
 
   user.passwordResetToken = passwordResetToken;
-  await user.save()
+  await user.save();
 
   const passwordResetLink = `"https://${BASE_URL}/water-tracker-frontend/forgot-password/${passwordResetToken}"`;
 
@@ -141,7 +141,7 @@ const recoverPassword = async (req, res) => {
   user.password = hashedPassword;
   user.passwordResetToken = null;
 
-  await user.save()
+  await user.save();
 
   res.status(200).json({
     message: `Password changed to: ${user.email}`,
@@ -242,7 +242,7 @@ const updateUserInfo = async (req, res) => {
 
   result = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
-  }).select("-password");
+  }).select("-password -passwordResetToken");
 
   if (!result) {
     throw HttpError(404, "Error updating user information.");
@@ -316,21 +316,21 @@ const googleRedirect = async (req, res) => {
     },
   });
 
-  const {email, name, picture} = userData.data;
+  const { email, name, picture } = userData.data;
 
   let user = await User.findOne({ email });
   if (!user) {
-    user = new User()
-    const nanoid = customAlphabet('1234567890qwertyuiopasdfghjklzxcvbnm', 16)
-    const password = nanoid()
+    user = new User();
+    const nanoid = customAlphabet("1234567890qwertyuiopasdfghjklzxcvbnm", 16);
+    const password = nanoid();
     const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword
+    user.password = hashedPassword;
   }
 
   user.email = email;
   user.name = name;
   user.avatarURL = picture;
-  await user.save()
+  await user.save();
 
   const payload = {
     id: user._id,
@@ -361,7 +361,7 @@ const googleRedirect = async (req, res) => {
   return res.redirect(
     `${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
   );
-}
+};
 
 export default {
   signUp: ctrWrapper(signUp),
@@ -375,4 +375,4 @@ export default {
   recoverPassword: ctrWrapper(recoverPassword),
   googleAuth: ctrWrapper(googleAuth),
   googleRedirect: ctrWrapper(googleRedirect),
-}
+};
