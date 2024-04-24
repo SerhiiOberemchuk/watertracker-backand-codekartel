@@ -381,23 +381,16 @@ const googleRedirect = async (req, res) => {
     { new: true }
   ).select("-password");
 
-  // res.status(200).json({
-  //   message: "Congratulations! Login successful!",
-
-  //   user: {
-  //     _id: updatedUser._id,
-  //     email: updatedUser.email,
-  //     token: updatedUser.token,
-  //     avatarURL: updatedUser.avatarURL,
-  //     name: updatedUser.name,
-  //     gender: updatedUser.gender,
-  //     waterRate: updatedUser.waterRate,
-  //   },
-  // });
-
-  return res.redirect(
-    `${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
-  );
+  if (process.env.BASE_URL?.includes('localhost')) {
+    return res.redirect(
+      `http://${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
+    );
+  }
+  else {
+    return res.redirect(
+      `https://${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
+    );
+  }
 }
 
 export default {
