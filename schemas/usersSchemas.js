@@ -7,7 +7,7 @@ export const userSignUpAndLoginSchema = Joi.object({
 });
 
 export const updateUserInfoSchema = Joi.object({
-  email: emailValidation.required(),
+  email: emailValidation,
   oldPassword: Joi.string().min(8).max(16).when("newPassword", {
     is: Joi.exist(),
     then: Joi.required(),
@@ -18,7 +18,7 @@ export const updateUserInfoSchema = Joi.object({
 });
 
 export const userEmailSchema = Joi.object({
-  email: emailValidation,
+  email: emailValidation.required(),
 });
 
 export const resetPasswordSchema = Joi.object({
