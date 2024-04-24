@@ -148,46 +148,13 @@ const recoverPassword = async (req, res) => {
   });
 };
 
-const resetPassword = async (req, res, next) => {
-  const { token, newPassword } = req.body;
-  try {
-    const { _id } = jwt.verify(token, JWT_SECRET);
-
-    const user = await User.findOne({ _id });
-    if (!user) {
-      next(HttpError(404, "User not found"));
-    }
-    if (token !== user.passwordResetToken) {
-      next(HttpError(400, "Invalid or expired reset token"));
-    }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    user.password = hashedPassword;
-    user.passwordResetToken = null;
-    await user.save();
-
-    res
-      .status(200)
-      .json({ message: "Your password has been changed successfully" });
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({
-        message:
-          "The reset link has expired. Please request a new password reset.",
-      });
-    } else {
-      res.status(500).json({ message: error.message });
-    }
-  }
-};
-
 const logOut = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: null });
   res.status(204).json();
 };
 
-export const updateAvatar = async (req, res, next) => {
+const updateAvatar = async (req, res, next) => {
   if (!req.file) {
     throw HttpError(400, "Please upload an avatar image file.");
   }
@@ -331,8 +298,6 @@ const googleRedirect = async (req, res) => {
     await user.save();
   }
 
-
-
   const payload = {
     id: user._id,
   };
@@ -345,12 +310,11 @@ const googleRedirect = async (req, res) => {
     { new: true }
   ).select("-password");
 
-  if (process.env.BASE_URL?.includes('localhost')) {
+  if (process.env.BASE_URL?.includes("localhost")) {
     return res.redirect(
       `http://${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
     );
-  }
-  else {
+  } else {
     return res.redirect(
       `https://${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
     );
@@ -360,7 +324,6 @@ const googleRedirect = async (req, res) => {
 export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
-  resetPassword: ctrWrapper(resetPassword),
   logOut: ctrWrapper(logOut),
   updateAvatar: ctrWrapper(updateAvatar),
   updateUserInfo: ctrWrapper(updateUserInfo),
