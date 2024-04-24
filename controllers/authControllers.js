@@ -354,9 +354,7 @@ const googleRedirect = async (req, res) => {
       `https://${process.env.BASE_URL}/water-tracker-frontend/google/${updatedUser.token}`
     );
   }
-}
 };
-
 
 export default {
   signUp: ctrWrapper(signUp),
