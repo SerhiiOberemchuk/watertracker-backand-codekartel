@@ -1,16 +1,20 @@
 import * as waterServices from "../services/waterServices.js";
 import { ctrWrapper } from "../helpers/ctrWrapper.js";
-import HttpError from "../helpers/HttpError.js";
 
 const getPercentOfDailyNorm = async (req, res) => {
   const { _id: userId } = req.user;
 
   const myRecords = await waterServices.getWaterRecordsToday(userId);
   if (!myRecords || myRecords.arrayValues.length === 0) {
-    throw HttpError(404, "Not found records for today");
+    return res.json({
+      message: "No water records found for today.",
+      percentOfDailyNorm: 0,
+      arreyWaterRecords: [],
+    });
   }
   const { percentOfDailyNorm, arrayValues } = myRecords;
   res.json({
+    message: "You have records for today.",
     percentOfDailyNorm: percentOfDailyNorm,
     arreyWaterRecords: arrayValues,
   });
