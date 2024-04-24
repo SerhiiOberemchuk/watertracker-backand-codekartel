@@ -19,15 +19,25 @@ export const checkWhetherWaterRecordExists = async (userId) => {
 
 export const updateValueWater = async (userId, objectId, value, time) => {
   const findRecord = await checkWhetherWaterRecordExists(userId);
-  const objectToUpdate = findRecord.arrayValues.find(
-    (item) => item._id.toString() === objectId
-  );
+  const objectToUpdate = Water.findOne({ "arrayValues._id": objectId });
   if (!objectToUpdate) {
     return objectToUpdate;
   }
+
   const updateRecord = await Water.findOneAndUpdate(
     { _id: findRecord._id, "arrayValues._id": objectId },
-    { $set: { "arrayValues.$.value": value, "arrayValues.$.time": time } },
+    {
+      $set: {
+        "arrayValues.$.value": value,
+        "arrayValues.$.time": time,
+        totalWater:
+          recalculateTotalWater(
+            findRecord.arrayValues.filter(
+              (item) => item._id.toString() !== objectId
+            )
+          ) + value,
+      },
+    },
     { new: true }
   );
   if (!updateRecord) {
@@ -35,12 +45,6 @@ export const updateValueWater = async (userId, objectId, value, time) => {
   }
   const updatedObject = updateRecord.arrayValues.find(
     (obj) => obj._id.toString() === objectId
-  );
-  const newTotalWater = recalculateTotalWater(updateRecord.arrayValues);
-
-  await Water.updateOne(
-    { _id: updateRecord._id },
-    { $set: { totalWater: newTotalWater } }
   );
 
   return updatedObject;

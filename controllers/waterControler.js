@@ -7,8 +7,8 @@ import Water from "../models/Water.js";
 const addWater = async (req, res) => {
   const { _id: user, waterRate } = req.user;
 
-  const { value } = req.body;
-  const { time } = req.body;
+  const { value, time } = req.body;
+
   const result = await waterServices.addWater({
     user,
     arrayValues: [{ value, time }],
