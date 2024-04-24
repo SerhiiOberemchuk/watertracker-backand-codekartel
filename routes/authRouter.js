@@ -7,7 +7,6 @@ import {
   userSignUpAndLoginSchema,
   updateUserInfoSchema,
   userEmailSchema,
-  resetPasswordSchema,
   recoverPasswordSchema,
 } from "../schemas/usersSchemas.js";
 
@@ -26,11 +25,7 @@ authRouter.post(
   validateBody(userSignUpAndLoginSchema),
   authController.signIn
 );
-authRouter.post(
-  "/reset-password",
-  validateBody(resetPasswordSchema),
-  authController.resetPassword
-);
+
 authRouter.post(
   "/forgot-password",
   validateBody(userEmailSchema),

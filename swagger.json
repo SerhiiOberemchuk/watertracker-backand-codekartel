@@ -106,25 +106,25 @@
         }
       }
     },
-    "/users/restore": {
+    "/users/forgot-password": {
       "post": {
         "tags": ["Auth"],
-        "summary": "Send password restore email",
-        "description": "Sends an email to the user with a link to restore their password if the provided email is associated with an account.",
+        "summary": "Request password reset",
+        "description": "Sends a password reset link to the user's email if the email is registered in the system.",
         "requestBody": {
-          "description": "Email of the user who wants to restore their password",
+          "description": "Email of the user to reset password.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserEmailRequest"
+                "$ref": "#/components/schemas/EmailRequest"
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Email successfully sent to the user's email address.",
+          "200": {
+            "description": "Password reset email sent successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -132,11 +132,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Message sent to example@example.com"
-                    },
-                    "passwordResetToken": {
-                      "type": "string",
-                      "example": "12345678.123456783.123456788"
+                      "example": "Message sent to email: user@example.com"
                     }
                   }
                 }
@@ -144,7 +140,7 @@
             }
           },
           "400": {
-            "description": "Missing required field email",
+            "description": "Missing required email field",
             "content": {
               "application/json": {
                 "schema": {
@@ -160,7 +156,7 @@
             }
           },
           "404": {
-            "description": "User not found or email is wrong",
+            "description": "No user found with the provided email",
             "content": {
               "application/json": {
                 "schema": {
@@ -178,25 +174,25 @@
         }
       }
     },
-    "/users/reset-password/{token}": {
+    "/users/recover-password": {
       "post": {
         "tags": ["Auth"],
-        "summary": "Reset user password",
-        "description": "Allows users to reset their password using a valid reset token they received by email.",
+        "summary": "Recover user password",
+        "description": "Allows users to set a new password using a password reset token.",
         "requestBody": {
-          "description": "New password details",
+          "description": "Password reset data including the new password and the token.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPasswordRequest"
+                "$ref": "#/components/schemas/RecoverPasswordRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Password successfully reset.",
+            "description": "Password successfully changed",
             "content": {
               "application/json": {
                 "schema": {
@@ -204,7 +200,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Your password has been changed successfully"
+                      "example": "Password changed to: user@example.com"
                     }
                   }
                 }
@@ -212,7 +208,7 @@
             }
           },
           "400": {
-            "description": "Invalid or expired reset token provided.",
+            "description": "Bad request due to missing fields or invalid token",
             "content": {
               "application/json": {
                 "schema": {
@@ -220,55 +216,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Invalid or expired reset token"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized access, token has expired.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "The reset link has expired. Please request a new password reset."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "User not found"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Internal server error"
+                      "example": "Bad request"
                     }
                   }
                 }
@@ -454,33 +402,163 @@
         }
       }
     },
-    "/water/today": {
+    "/users/google": {
       "get": {
-        "tags": ["Today"],
-        "summary": "Get today's water consumption",
-        "description": "Retrieves the percentage of daily water norm consumed today along with individual records of water intake.",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
+        "tags": ["Auth"],
+        "summary": "Google OAuth Authentication",
+        "description": "Redirects to Google's OAuth 2.0 server for user authentication and authorization. The user is prompted to consent to the requested access (email and profile).",
+        "operationId": "googleAuth",
         "responses": {
-          "200": {
-            "description": "Water consumption data for today.",
+          "302": {
+            "description": "Redirect to Google's OAuth 2.0 authorization server.",
+            "headers": {
+              "Location": {
+                "description": "URL to Google's OAuth 2.0 authorization server with the necessary query parameters.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Redirecting to Google."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/google-redirect": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Google OAuth Redirect",
+        "description": "Handles the redirection from Google after OAuth consent. Exchanges the authorization code for an access token and fetches user data from Google. Registers or updates the user in the local database and redirects to the frontend with the user's token.",
+        "operationId": "googleRedirect",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Authorization code returned by Google after user consents to the access request."
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to the frontend application with the user's token.",
+            "headers": {
+              "Location": {
+                "description": "URL to the frontend application with the user token.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Redirecting to frontend."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request due to missing or invalid authorization code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid or missing authorization code."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error if there are issues handling the request or updating the user information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to handle the request."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/water/today": {
+      "get": {
+        "tags": ["Today"],
+        "summary": "Get today's water consumption records",
+        "description": "Fetches water consumption records for today for the authenticated user, including the percentage of their daily water consumption norm.",
+        "operationId": "getTodayWaterRecords",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the water records for today. If no records are found, returns a message indicating no records are available.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You have records for today."
+                    },
                     "percentOfDailyNorm": {
-                      "type": "number",
-                      "description": "The percentage of daily water norm that has been consumed today."
+                      "type": "integer",
+                      "description": "Percentage of daily water consumption norm that has been met.",
+                      "example": 75
                     },
                     "arreyWaterRecords": {
                       "type": "array",
                       "description": "List of water consumption records for today.",
                       "items": {
-                        "$ref": "#/components/schemas/WaterRecord"
+                        "type": "object",
+                        "properties": {
+                          "time": {
+                            "type": "string",
+                            "format": "hh:mm",
+                            "description": "Time when the water was consumed."
+                          },
+                          "value": {
+                            "type": "number",
+                            "description": "Amount of water consumed at this time, in milliliters."
+                          }
+                        }
                       }
                     }
                   }
@@ -489,10 +567,10 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized access, token missing or invalid."
           },
           "404": {
-            "description": "Not found"
+            "description": "The specified resource was not found."
           }
         }
       }
@@ -955,28 +1033,30 @@
           }
         }
       },
-      "UserEmailRequest": {
+      "EmailRequest": {
         "type": "object",
         "required": ["email"],
         "properties": {
           "email": {
             "type": "string",
             "format": "email",
-            "description": "Email address of the user requesting password restoration"
+            "description": "The email address associated with the user's account."
           }
         }
       },
-      "ResetPasswordRequest": {
+      "RecoverPasswordRequest": {
         "type": "object",
-        "required": ["token", "newPassword"],
+        "required": ["password", "token"],
         "properties": {
+          "password": {
+            "type": "string",
+            "description": "The new password for the user.",
+            "minLength": 8,
+            "maxLength": 16
+          },
           "token": {
             "type": "string",
-            "description": "The reset token received by email."
-          },
-          "newPassword": {
-            "type": "string",
-            "description": "The new password for the user account."
+            "description": "The password reset token provided to the user."
           }
         }
       },

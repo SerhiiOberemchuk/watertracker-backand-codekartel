@@ -13,7 +13,7 @@ const getPercentOfDailyNorm = async (req, res) => {
     });
   }
   const { percentOfDailyNorm, arrayValues } = myRecords;
-  res.json({
+  return res.json({
     message: "You have records for today.",
     percentOfDailyNorm: percentOfDailyNorm,
     arreyWaterRecords: arrayValues,
