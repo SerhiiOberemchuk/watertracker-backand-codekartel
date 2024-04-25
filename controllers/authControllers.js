@@ -179,6 +179,11 @@ const updateUserInfo = async (req, res) => {
   if (!user) {
     throw HttpError(404, "User not found.");
   }
+  const userWithEmail = await User.findOne({ email: updateData.email });
+
+  if (userWithEmail) {
+    throw HttpError(409, "Email in use");
+  }
 
   let passwordUpdated = false;
   if (updateData.newPassword) {
