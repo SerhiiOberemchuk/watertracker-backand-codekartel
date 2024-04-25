@@ -19,7 +19,7 @@ const Joi = JoiBase.extend({
   },
 });
 
-export const addWaterSchema = Joi.object({
+export const waterSchema = Joi.object({
   value: Joi.number().min(50).max(5000).messages({
     "number.base": '"value" must be a number',
     "number.min": '"value" must be at least {#limit}',
@@ -28,12 +28,6 @@ export const addWaterSchema = Joi.object({
   time: Joi.time().base().required(),
 });
 
-export const updateWaterSchema = Joi.object({
-  value: Joi.number().messages({
-    "number.base": '"value" must be a number',
-  }),
-  time: Joi.time().base().required(),
-});
 export const waterRateSchema = Joi.object({
   amountOfWater: Joi.number().min(0.1).max(15).required(),
 });
