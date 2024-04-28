@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
 import User from "../models/User.js";
 
-const { JWT_SECRET } = process.env;
+const { ACCESS_JWT_SECRET } = process.env;
 
 const authenticate = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -14,11 +14,12 @@ const authenticate = async (req, res, next) => {
   if (bearer !== "Bearer") {
     return next(HttpError(401, "Bearer not found"));
   }
+
   try {
-    const { id } = jwt.verify(token, JWT_SECRET);
+    const { id } = jwt.verify(token, ACCESS_JWT_SECRET);
     const user = await User.findById(id);
 
-    if (!user || !user.token || user.token !== token) {
+    if (!user || !user.accessToken || user.accessToken !== token) {
       next(HttpError(401, "Not authorized"));
     }
 

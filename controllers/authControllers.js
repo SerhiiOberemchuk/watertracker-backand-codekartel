@@ -11,7 +11,13 @@ import queryString from "query-string";
 
 dotenv.config();
 
-const { JWT_SECRET, JWT_EXPIRES_IN, BASE_URL } = process.env;
+const {
+  ACCESS_JWT_SECRET,
+  REFRESH_JWT_SECRET,
+  ACCESS_JWT_EXPIRES_IN,
+  REFRESH_JWT_EXPIRES_IN,
+  BASE_URL,
+} = process.env;
 
 const signUp = async (req, res, next) => {
   const { email, password } = req.body;
@@ -33,10 +39,15 @@ const signUp = async (req, res, next) => {
     id: newUser._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  const accessToken = jwt.sign(payload, ACCESS_JWT_SECRET, {
+    expiresIn: ACCESS_JWT_EXPIRES_IN,
+  });
+  const refreshToken = jwt.sign(payload, REFRESH_JWT_SECRET, {
+    expiresIn: REFRESH_JWT_EXPIRES_IN,
+  });
   const updatedUser = await User.findOneAndUpdate(
     newUser._id,
-    { token },
+    { accessToken, refreshToken },
     { new: true }
   );
 
@@ -45,7 +56,8 @@ const signUp = async (req, res, next) => {
     newUser: {
       _id: updatedUser._id,
       email: updatedUser.email,
-      token,
+      accessToken,
+      refreshToken,
       avatarURL: updatedUser.avatarURL,
       name: updatedUser.name,
       gender: updatedUser.gender,
@@ -71,11 +83,16 @@ const signIn = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  const accessToken = jwt.sign(payload, ACCESS_JWT_SECRET, {
+    expiresIn: ACCESS_JWT_EXPIRES_IN,
+  });
+  const refreshToken = jwt.sign(payload, REFRESH_JWT_SECRET, {
+    expiresIn: REFRESH_JWT_EXPIRES_IN,
+  });
 
   const updatedUser = await User.findByIdAndUpdate(
     user._id,
-    { token },
+    { refreshToken, accessToken },
     { new: true }
   ).select("-password");
 
@@ -85,7 +102,8 @@ const signIn = async (req, res) => {
     user: {
       _id: updatedUser._id,
       email: updatedUser.email,
-      token: updatedUser.token,
+      accessToken: updatedUser.accessToken,
+      refreshToken: updatedUser.refreshToken,
       avatarURL: updatedUser.avatarURL,
       name: updatedUser.name,
       gender: updatedUser.gender,
@@ -150,8 +168,39 @@ const recoverPassword = async (req, res) => {
 
 const logOut = async (req, res) => {
   const { _id } = req.user;
-  await User.findByIdAndUpdate(_id, { token: null });
+  await User.findByIdAndUpdate(_id, { accessToken: null, refreshToken: null });
   res.status(204).json();
+};
+const refresh = async (req, res) => {
+  const { refreshToken } = req.body;
+  try {
+    const { id } = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
+    const isExist = await User.findOne({ refreshToken });
+
+    if (!isExist) {
+      throw HttpError(403, "Token invalid");
+    }
+    const payload = { id };
+    const newAccessToken = jwt.sign(payload, ACCESS_JWT_SECRET, {
+      expiresIn: ACCESS_JWT_EXPIRES_IN,
+    });
+    const newRefreshToken = jwt.sign(payload, REFRESH_JWT_SECRET, {
+      expiresIn: REFRESH_JWT_EXPIRES_IN,
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { accessToken: newAccessToken, refreshToken: newRefreshToken },
+      { new: true }
+    );
+
+    res.json({
+      accessToken: updatedUser.accessToken,
+      refreshToken: updatedUser.refreshToken,
+    });
+  } catch (error) {
+    throw HttpError(403, error.message);
+  }
 };
 
 const updateAvatar = async (req, res, next) => {
@@ -330,6 +379,7 @@ export default {
   signUp: ctrWrapper(signUp),
   signIn: ctrWrapper(signIn),
   logOut: ctrWrapper(logOut),
+  refresh: ctrWrapper(refresh),
   updateAvatar: ctrWrapper(updateAvatar),
   updateUserInfo: ctrWrapper(updateUserInfo),
   getUserInfo: ctrWrapper(getUserInfo),

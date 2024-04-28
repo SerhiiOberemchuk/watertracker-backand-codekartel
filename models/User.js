@@ -13,7 +13,11 @@ const userSchema = new Schema(
       required: [true, "Email is required"],
       unique: true,
     },
-    token: {
+    accessToken: {
+      type: String,
+      default: null,
+    },
+    refreshToken: {
       type: String,
       default: null,
     },
@@ -36,11 +40,11 @@ const userSchema = new Schema(
     },
     passwordResetToken: {
       type: String,
-      default: null
+      default: null,
     },
   },
   {
-    versionKey: false
+    versionKey: false,
   }
 );
 

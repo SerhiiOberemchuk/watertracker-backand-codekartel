@@ -30,3 +30,7 @@ export const recoverPasswordSchema = Joi.object({
   password: Joi.string().min(8).max(16).required(),
   token: Joi.string().required(),
 });
+
+export const refreshTokenSchema = Joi.object({
+  refreshToken: Joi.string().required(),
+});
